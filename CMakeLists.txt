@@ -1,0 +1,33 @@
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+cmake_minimum_required(VERSION 2.8.3)
+project(cnbiros_wheelchair)
+
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs nav_msgs geometry_msgs message_generation cnbiros_core)
+
+SET(CMAKE_BUILD_TYPE RelWithDebInfo)
+
+include_directories(${catkin_INCLUDE_DIRS} 
+		    include)
+
+catkin_package(
+  INCLUDE_DIRS 
+	include
+  LIBRARIES 
+	${PROJECT_NAME}
+  CATKIN_DEPENDS
+  	roscpp
+	message_runtime
+)
+
+add_library(cnbiros_wheelchair
+			src/DXGPSB.cpp
+			src/DXGPSBThread.cpp
+			src/Motors.cpp)
+target_link_libraries(cnbiros_wheelchair
+					  ${catkin_LIBRARIES})
+
+add_executable(example_dxgpsb examples/example_dxgpsb.cpp)
+target_link_libraries(example_dxgpsb cnbiros_wheelchair)
+
+add_executable(ros_wheelchair_motors src/ros_wheelchair_motors.cpp)
+target_link_libraries(ros_wheelchair_motors cnbiros_wheelchair)

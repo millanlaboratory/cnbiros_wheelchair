@@ -1,0 +1,7 @@
+<launch>
+	<arg name="port" default="/dev/ttyUSB0" />
+	<node name="motors" pkg="cnbiros_wheelchair" type="ros_wheelchair_motors" output="screen">
+		<param name="port" value="$(arg port)" />
+	</node>
+</launch>
+
