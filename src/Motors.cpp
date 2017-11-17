@@ -29,6 +29,8 @@ int Motors::Open(const std::string& port) {
 		throw std::runtime_error(e.what());
 	}
 
+	// to initialize (to be done better)
+	this->dxgpsb_->setVelocities(0.0f, 0.0f);
 	return retcod;
 }
 
