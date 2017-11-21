@@ -40,7 +40,9 @@ target_link_libraries(cnbiros_wheelchair
 					  ${catkin_LIBRARIES})
 
 add_executable(example_dxgpsb examples/example_dxgpsb.cpp)
+add_dependencies(example_dxgpsb cnbiros_wheelchair_generate_messages_cpp)
 target_link_libraries(example_dxgpsb cnbiros_wheelchair)
 
 add_executable(ros_wheelchair_motors src/ros_wheelchair_motors.cpp)
+add_dependencies(ros_wheelchair_motors cnbiros_wheelchair_generate_messages_cpp)
 target_link_libraries(ros_wheelchair_motors cnbiros_wheelchair)
