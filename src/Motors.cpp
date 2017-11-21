@@ -49,9 +49,34 @@ int Motors::Open(const std::string& port) {
 		throw std::runtime_error(e.what());
 	}
 
-	// to initialize (to be done better)
-	this->dxgpsb_->setVelocities(0.0f, 0.0f);
+	this->Stop();
 	return retcod;
+}
+
+int Motors::SetVelocity(float v, float w) {
+	int ret = -1;
+	if(this->dxgpsb_ != nullptr)
+		ret = this->dxgpsb_->setVelocities(v, w);
+
+	return ret;
+}
+
+int Motors::GetVelocity(float& v, float& w) {
+
+	int ret = -1;
+	
+	if(this->dxgpsb_ != nullptr)
+		ret = this->dxgpsb_->getVelocities(v, w);
+
+	return ret;
+}
+
+int Motors::Stop(void) {
+	return this->SetVelocity(0.0f, 0.0f);
+}
+
+int Motors::Forward(float v) {
+	return this->SetVelocity(v, 0.0f);
 }
 
 void Motors::on_command_velocity(const geometry_msgs::Twist& msg) {
@@ -59,46 +84,56 @@ void Motors::on_command_velocity(const geometry_msgs::Twist& msg) {
 	float v, w;
 	v = msg.linear.x;
 	w = msg.angular.z;
-	this->dxgpsb_->setVelocities(v, w);
+	this->SetVelocity(v, w);
 }
 
 
-void Motors::on_srv_stop_(cnbiros_wheelchair::Stop::Request& req,
+bool Motors::on_srv_stop_(cnbiros_wheelchair::Stop::Request& req,
 						  cnbiros_wheelchair::Stop::Response& res) {
 
-	this->SetVelocity(0.0f, 0.0f);
+	bool retcode = false;
+	
+	if(this->Stop() == 0)
+		retcode = true;
 
-	// Add result depending on SetVelocity output
-	res.result = true;
+	res.result = retcode;
 }
 
-void Motors::on_srv_forward_(cnbiros_wheelchair::Forward::Request& req,
+bool Motors::on_srv_forward_(cnbiros_wheelchair::Forward::Request& req,
 						     cnbiros_wheelchair::Forward::Response& res) {
 
-	this->SetVelocity(CNBIROS_WHEELCHAIR_DEFAULT_VELOCITY, 0.0f);
+	bool retcode = false;
+	
+	if(this->Forward() == 0)
+		retcode = true;
 
-	// Add result depending on SetVelocity output
-	res.result = true;
+	res.result = retcode;
 }
 
-void Motors::on_srv_setvelocity_(cnbiros_wheelchair::SetVelocity::Request& req,
+bool Motors::on_srv_setvelocity_(cnbiros_wheelchair::SetVelocity::Request& req,
 								 cnbiros_wheelchair::SetVelocity::Response& res) {
 
-	this->SetVelocity(req.v, req.w);
+	bool retcode = false;
 
-	// Add result depending on SetVelocity output
-	res.result = true;
+	if(this->SetVelocity(req.v, req.w) == 0) 
+		retcode = true;
+
+	res.result = retcode;
 }
 
-void Motors::on_srv_setvelocity_(cnbiros_wheelchair::SetVelocity::Request& req,
-								 cnbiros_wheelchair::SetVelocity::Response& res) {
+bool Motors::on_srv_getvelocity_(cnbiros_wheelchair::GetVelocity::Request& req,
+								 cnbiros_wheelchair::GetVelocity::Response& res) {
 
-	float v, w;
-	this->GetVelocity(&v, &w);
+	float v = 0.0f;
+	float w = 0.0f;
+	bool retcode = false;
+	
+	if(this->GetVelocity(v, w) == 0)
+		retcode = true;
 
-	// Add result depending on GetVelocity output
-	res.result.v = v;
-	res.result.w = w;
+	res.result = retcode;
+	res.v = v;
+	res.w = w;
 }
 
 	}
