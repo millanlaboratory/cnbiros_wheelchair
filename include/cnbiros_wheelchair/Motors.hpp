@@ -12,7 +12,11 @@
 
 #include "DXGPSBThread.hpp"
 
-#define CNBIROS_WHEELCHAIR_DEFAULT_VELOCITY		0.5f
+#define CNBIROS_WHEELCHAIR_VELOCITY_DEFAULT			 0.5f
+#define CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX		 1.0f
+#define CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN		-1.0f
+#define CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX	 1.0f
+#define CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN	-1.0f
 
 namespace cnbiros {
 	namespace wheelchair {
@@ -28,7 +32,7 @@ class Motors : public cnbiros::core::NodeInterface {
 		int SetVelocity(float v, float w);
 		int GetVelocity(float& v, float& w);
 		int Stop(void);
-		int Forward(float v = CNBIROS_WHEELCHAIR_DEFAULT_VELOCITY);
+		int Forward(float v = CNBIROS_WHEELCHAIR_VELOCITY_DEFAULT);
 
 	private:
 		void on_command_velocity(const geometry_msgs::Twist& msg);

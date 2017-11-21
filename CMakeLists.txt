@@ -6,8 +6,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp std_msgs message_generation  nav_
 
 SET(CMAKE_BUILD_TYPE RelWithDebInfo)
 
-include_directories(${catkin_INCLUDE_DIRS} 
-		    include)
 
 add_service_files(
   FILES
@@ -31,6 +29,9 @@ catkin_package(
   	roscpp
 	message_runtime
 )
+
+include_directories(${catkin_INCLUDE_DIRS} 
+		    include)
 
 add_library(cnbiros_wheelchair
 			src/DXGPSB.cpp

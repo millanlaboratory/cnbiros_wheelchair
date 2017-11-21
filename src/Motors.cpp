@@ -55,8 +55,23 @@ int Motors::Open(const std::string& port) {
 
 int Motors::SetVelocity(float v, float w) {
 	int ret = -1;
-	if(this->dxgpsb_ != nullptr)
-		ret = this->dxgpsb_->setVelocities(v, w);
+	if(this->dxgpsb_ != nullptr) {
+		if (v > CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX) {
+			ROS_WARN("Maximum linear velocity %f. Provided velocity: %f", 
+					 CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX, v);
+		} else if(v < CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN) {
+			ROS_WARN("Minimum linear velocity %f. Provided velocity: %f", 
+					 CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN, v);
+		} else if(w > CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX) {
+			ROS_WARN("Maximum rotation velocity %f. Provided velocity: %f", 
+					 CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX, w);
+		} else if(w < CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN) {
+			ROS_WARN("Minimum rotation velocity %f. Provided velocity: %f", 
+					 CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN, w);
+		} else {
+			ret = this->dxgpsb_->setVelocities(v, w);
+		}
+	}
 
 	return ret;
 }
@@ -97,6 +112,7 @@ bool Motors::on_srv_stop_(cnbiros_wheelchair::Stop::Request& req,
 		retcode = true;
 
 	res.result = retcode;
+	return retcode;
 }
 
 bool Motors::on_srv_forward_(cnbiros_wheelchair::Forward::Request& req,
@@ -108,6 +124,7 @@ bool Motors::on_srv_forward_(cnbiros_wheelchair::Forward::Request& req,
 		retcode = true;
 
 	res.result = retcode;
+	return retcode;
 }
 
 bool Motors::on_srv_setvelocity_(cnbiros_wheelchair::SetVelocity::Request& req,
@@ -119,6 +136,7 @@ bool Motors::on_srv_setvelocity_(cnbiros_wheelchair::SetVelocity::Request& req,
 		retcode = true;
 
 	res.result = retcode;
+	return retcode;
 }
 
 bool Motors::on_srv_getvelocity_(cnbiros_wheelchair::GetVelocity::Request& req,
@@ -134,6 +152,8 @@ bool Motors::on_srv_getvelocity_(cnbiros_wheelchair::GetVelocity::Request& req,
 	res.result = retcode;
 	res.v = v;
 	res.w = w;
+	
+	return retcode;
 }
 
 	}
