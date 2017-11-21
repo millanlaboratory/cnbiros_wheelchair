@@ -9,8 +9,28 @@ namespace cnbiros {
 Motors::Motors(ros::NodeHandle* node) : 
 			   cnbiros::core::NodeInterface(node, "motors") {
 
-	this->rossub_ = node->subscribe("cmd_vel", 1, &Motors::on_command_velocity, this);
+	// Initialize dxgpsb pointer
 	this->dxgpsb_ = nullptr;
+	
+	// Initialize subscriber
+	this->rossub_ = node->subscribe("cmd_vel", 1, &Motors::on_command_velocity, this);
+
+	// Add services
+	this->rossrv_stop_ = node->advertiseService(
+						 ros::this_node::getName() + "/stop", 
+						 &Motors::on_srv_stop_, this);
+	
+	this->rossrv_forward_ = node->advertiseService(
+							ros::this_node::getName() + "/forward", 
+							&Motors::on_srv_forward_, this);
+	
+	this->rossrv_setvelocity_ = node->advertiseService(
+								ros::this_node::getName() + "/setvelocity", 
+								&Motors::on_srv_setvelocity_, this);
+	
+	this->rossrv_getvelocity_ = node->advertiseService(
+								ros::this_node::getName() + "/getvelocity", 
+								&Motors::on_srv_getvelocity_, this);
 }
 
 Motors::~Motors(void){
@@ -40,6 +60,44 @@ void Motors::on_command_velocity(const geometry_msgs::Twist& msg) {
 	this->dxgpsb_->setVelocities(v, w);
 }
 
+
+void Motors::on_srv_stop_(cnbiros_wheelchair::Stop::Request& req,
+						  cnbiros_wheelchair::Stop::Response& res) {
+
+	this->SetVelocity(0.0f, 0.0f);
+
+	// Add result depending on SetVelocity output
+	res.result = true;
+}
+
+void Motors::on_srv_forward_(cnbiros_wheelchair::Forward::Request& req,
+						     cnbiros_wheelchair::Forward::Response& res) {
+
+	this->SetVelocity(CNBIROS_WHEELCHAIR_DEFAULT_VELOCITY, 0.0f);
+
+	// Add result depending on SetVelocity output
+	res.result = true;
+}
+
+void Motors::on_srv_setvelocity_(cnbiros_wheelchair::SetVelocity::Request& req,
+								 cnbiros_wheelchair::SetVelocity::Response& res) {
+
+	this->SetVelocity(req.v, req.w);
+
+	// Add result depending on SetVelocity output
+	res.result = true;
+}
+
+void Motors::on_srv_setvelocity_(cnbiros_wheelchair::SetVelocity::Request& req,
+								 cnbiros_wheelchair::SetVelocity::Response& res) {
+
+	float v, w;
+	this->GetVelocity(&v, &w);
+
+	// Add result depending on GetVelocity output
+	res.result.v = v;
+	res.result.w = w;
+}
 
 	}
 }
