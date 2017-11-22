@@ -1,0 +1,264 @@
+<?xml version="1.0"?>
+<robot name="wheelchair">
+	
+<!-- ***************** Materials (colors) **************************-->
+	<material name="black">
+		<color rgba="0 0 0 1"/>
+	</material>
+	
+	<material name="grey">
+		<color rgba="0.8 0.8 0.8 1"/>
+	</material>
+	
+	<material name="green">
+		<color rgba="0 1 0 1"/>
+	</material>
+
+<!-- ****************** Wheelchair Base ************************** -->
+	<!-- Wheelchair Base - Link -->
+	<link name="base_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.31 0.63 0.35"/>
+			</geometry>
+			<material name="black"/>
+		</visual>
+
+		<collision>
+			<origin xyz="0 0 0.35" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.80 1.1 1.4"/>
+			</geometry>
+		</collision>
+
+	</link>
+
+<!-- ****************** Wheelchair Wheels ************************** -->
+	<!-- Wheelchair Wheel0 - Link -->
+	<link name="wheel0_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 1.5705 0"/>
+			<geometry>
+				<cylinder radius="0.175" length="0.08"/>
+			</geometry>
+			<material name="grey"/>
+		</visual>
+	</link>
+	<!-- Wheelchair Wheel0 - Joint -->
+	<joint name="wheel0_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="wheel0_link"/>
+		<origin xyz="-0.295 0.095 -0.085" rpy="0 0 0"/>
+    </joint>
+	
+	<!-- Wheelchair Wheel1 - Link -->
+	<link name="wheel1_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 1.5705 0"/>
+			<geometry>
+				<cylinder radius="0.175" length="0.08"/>
+			</geometry>
+			<material name="grey"/>
+		</visual>
+	</link>
+	<!-- Wheelchair Wheel1 - Joint -->
+	<joint name="wheel1_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="wheel1_link"/>
+		<origin xyz="0.295 0.095 -0.085" rpy="0 0 0"/>
+    </joint>
+
+	<!-- Wheelchair BackWheel0 - Link -->
+	<link name="backwheel0_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 1.5705 0"/>
+			<geometry>
+				<cylinder radius="0.09" length="0.04"/>
+			</geometry>
+			<material name="grey"/>
+		</visual>
+	</link>
+	<!-- Wheelchair BackWheel0 - Joint -->
+	<joint name="backwheel0_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="backwheel0_link"/>
+		<origin xyz="-0.225 -0.405 -0.18" rpy="0 0 0"/>
+    </joint>
+
+	<!-- Wheelchair BackWheel1 - Link -->
+	<link name="backwheel1_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 1.5705 0"/>
+			<geometry>
+				<cylinder radius="0.09" length="0.04"/>
+			</geometry>
+			<material name="grey"/>
+		</visual>
+	</link>
+	<!-- Wheelchair BackWheel1 - Joint -->
+	<joint name="backwheel1_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="backwheel1_link"/>
+		<origin xyz="0.225 -0.405 -0.18" rpy="0 0 0"/>
+    </joint>
+
+	<!-- Wheelchair FrontWheel0 - Link -->
+	<link name="frontwheel0_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 1.5705 0"/>
+			<geometry>
+				<cylinder radius="0.09" length="0.04"/>
+			</geometry>
+			<material name="grey"/>
+		</visual>
+	</link>
+	<!-- Wheelchair FrontWheel0 - Joint -->
+	<joint name="frontwheel0_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="frontwheel0_link"/>
+		<origin xyz="-0.285 0.385 -0.18" rpy="0 0 0"/>
+    </joint>
+
+	<!-- Wheelchair FrontWheel1 - Link -->
+	<link name="frontwheel1_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 1.5705 0"/>
+			<geometry>
+				<cylinder radius="0.09" length="0.04"/>
+			</geometry>
+			<material name="grey"/>
+		</visual>
+	</link>
+	<!-- Wheelchair FrontWheel1 - Joint -->
+	<joint name="frontwheel1_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="frontwheel1_link"/>
+		<origin xyz="0.285 0.385 -0.18" rpy="0 0 0"/>
+    </joint>
+
+<!-- ****************** Wheelchair Upper ************************** -->
+	<!-- Wheelchair Seat - Link -->
+	<link name="seat_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0 0 0"/>
+			<geometry>
+				<box size="0.51 0.48 0.12"/>
+			</geometry>
+			<material name="black"/>
+		</visual>
+	</link>
+	
+	<!-- Wheelchair Seat - Joint -->
+	<joint name="seat_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="seat_link"/>
+		<origin xyz="0.0 0.075 0.2975" rpy="0 0 0"/>
+    </joint>
+
+	<!-- Wheelchair BackSeat - Link -->
+	<link name="backseat_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0.0 0 0"/>
+			<geometry>
+				<box size="0.51 0.12 0.83"/>
+			</geometry>
+			<material name="black"/>
+		</visual>
+	</link>
+	
+	<!-- Wheelchair Seat - Joint -->
+	<joint name="backseat_joint" type="fixed">
+		<parent link="seat_link"/>
+		<child link="backseat_link"/>
+		<origin xyz="0.0 -0.30 0.355" rpy="0.3 0 0"/>
+    </joint>
+
+	<!-- Wheelchair platform - Link -->
+	<link name="platform_link">
+		<visual>
+			<origin xyz="0 0 0" rpy="0.0 0 0"/>
+			<geometry>
+				<box size="0.51 0.5 0.031"/>
+			</geometry>
+			<material name="grey"/>
+		</visual>
+	</link>
+	
+	<!-- Wheelchair Seat - Joint -->
+	<joint name="platform_joint" type="fixed">
+		<parent link="seat_link"/>
+		<child link="platform_link"/>
+		<origin xyz="0.0 -0.40 0.08" rpy="0.0 0 0"/>
+    </joint>
+	
+<!-- ****************** Sonars ***************************** -->
+	<!-- Sonar 0xe0 - Link -->
+	<link name="sonar_0xe0_link">
+		<visual>
+			<geometry>
+				<box size="0.032 0.012 0.015" />
+			</geometry>
+			<material name="green"/>
+		</visual>
+	</link>
+
+	<!-- Sonar 0xe0 - Joint -->
+	<joint name="sonar_0xe0_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="sonar_0xe0_link"/>
+		<origin xyz="0.10 0.565 -0.05"/>
+    </joint>
+
+	<!-- Sonar 0xe2 - Link -->
+	<link name="sonar_0xe2_link">
+		<visual>
+			<geometry>
+				<box size="0.032 0.012 0.015" />
+			</geometry>
+			<material name="green"/>
+		</visual>
+	</link>
+
+	<!-- Sonar 0xe2 - Joint -->
+	<joint name="sonar_0xe2_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="sonar_0xe2_link"/>
+		<origin xyz="0.265 0.385 0.01" rpy="0 0 0"/>
+    </joint>
+
+	<!-- Sonar 0xea - Link -->
+	<link name="sonar_0xea_link">
+		<visual>
+			<geometry>
+				<box size="0.032 0.012 0.015" />
+			</geometry>
+			<material name="green"/>
+		</visual>
+	</link>
+
+	<!-- Sonar 0xea - Joint -->
+	<joint name="sonar_0xea_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="sonar_0xea_link"/>
+		<origin xyz="-0.10 0.565 -0.05"/>
+    </joint>
+
+	<!-- Sonar 0xec - Link -->
+	<link name="sonar_0xec_link">
+		<visual>
+			<geometry>
+				<box size="0.032 0.012 0.015" />
+			</geometry>
+			<material name="green"/>
+		</visual>
+	</link>
+
+	<!-- Sonar 0xec - Joint -->
+	<joint name="sonar_0xec_joint" type="fixed">
+		<parent link="base_link"/>
+		<child link="sonar_0xec_link"/>
+		<origin xyz="-0.265 0.385 0.01" rpy="0 0 0"/>
+    </joint>
+
+</robot>
