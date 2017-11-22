@@ -1,0 +1,7 @@
+<launch>
+	<arg name="port" default="/dev/ttyACM0" />
+	<node name="sonars" pkg="cnbiros_wheelchair" type="ros_wheelchair_ultrasonics" output="screen">
+		<param name="port" value="$(arg port)" />
+	</node>
+</launch>
+
