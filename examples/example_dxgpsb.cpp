@@ -2,7 +2,7 @@
 #include <fstream>
 #include <cmath>
 
-#include "cnbiros_wheelchair/DXGPSBThread.hpp"
+#include "cnbiros_wheelchair/DxgpsbThread.hpp"
 
 using namespace std;
 
@@ -38,14 +38,14 @@ float byte2float(char b){
 int main(int argc, char* argv[]) {
 	std::cout << "Invacare/Dynamics/EPFL dx-gpsb test program, luca.tonin@epfl.ch 2017" << std::endl;
   	
-	cnbiros::wheelchair::DXGPSBThread* dxgpsbt;
+	cnbiros::wheelchair::DxgpsbThread* dxgpsbt;
   	float v, w;
 	
 	try { 
 		if (argc == 2){
-  		  dxgpsbt = new cnbiros::wheelchair::DXGPSBThread(argv[1]);
+  		  dxgpsbt = new cnbiros::wheelchair::DxgpsbThread(argv[1]);
   		} else {
-  		  dxgpsbt = new cnbiros::wheelchair::DXGPSBThread();
+  		  dxgpsbt = new cnbiros::wheelchair::DxgpsbThread();
   		}
 	} catch (std::logic_error& e) {
 		std::cout<<"error code: "<<e.what()<<std::endl;

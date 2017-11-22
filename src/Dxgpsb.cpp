@@ -1,12 +1,12 @@
 #ifndef CNBIROS_WHEELCHAIR_DXGPSB_CPP
 #define CNBIROS_WHEELCHAIR_DXGPSB_CPP
 
-#include "cnbiros_wheelchair/DXGPSB.hpp"
+#include "cnbiros_wheelchair/Dxgpsb.hpp"
 
 namespace cnbiros {
 	namespace wheelchair {
 
-DXGPSB::DXGPSB(const std::string& port) {
+Dxgpsb::Dxgpsb(const std::string& port) {
   
 	// Initialise stationary velocities;
 	v_tx = 0x80;
@@ -16,15 +16,15 @@ DXGPSB::DXGPSB(const std::string& port) {
 
 	try {
 		this->setupPort(port.c_str());
-		printf("Created a DXGPSB object\n");
+		printf("Created a Dxgpsb object\n");
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(e.what());
 	}
 }
 
-DXGPSB::~DXGPSB(void){}
+Dxgpsb::~Dxgpsb(void){}
 
-bool DXGPSB::seekByte(char b, int search_limit = 24) {
+bool Dxgpsb::seekByte(char b, int search_limit = 24) {
 	int myerrno, nread;
   	unsigned int ndata, totalread, tries, maxtries;
   	unsigned char sbuf[10];
@@ -60,7 +60,7 @@ bool DXGPSB::seekByte(char b, int search_limit = 24) {
 
 /* Writes to device and automatically generates and appends a sequence byte and
  * Dynamics checksum */
-int DXGPSB::writeToDevice(int n_bytes, unsigned char* data) {
+int Dxgpsb::writeToDevice(int n_bytes, unsigned char* data) {
 
 	int retval = 0;
 	unsigned char crem;
@@ -99,7 +99,7 @@ int DXGPSB::writeToDevice(int n_bytes, unsigned char* data) {
 }
 
 /* Writes plain bytes to device without a checksum */
-int DXGPSB::writeToDeviceNOCHKSUM(int n_bytes, unsigned char* data) {
+int Dxgpsb::writeToDeviceNOCHKSUM(int n_bytes, unsigned char* data) {
 	int retval = 0;
 
   	tcflush( this->fd, TCOFLUSH );
@@ -116,7 +116,7 @@ int DXGPSB::writeToDeviceNOCHKSUM(int n_bytes, unsigned char* data) {
 }
 
 /* Reads regular packets from DX-GPSB */
-int DXGPSB::readDevice(unsigned char *return_data) {
+int Dxgpsb::readDevice(unsigned char *return_data) {
 
 	int myerrno, nread;
   	unsigned int ndata, totalread, tries, maxtries;  
@@ -125,11 +125,11 @@ int DXGPSB::readDevice(unsigned char *return_data) {
   	 
   	// Check for start byte
   	if (!seekByte('@')){
-		printf( "Missing sample from DXGPSB (start byte not found)\n" );
+		printf( "Missing sample from Dxgpsb (start byte not found)\n" );
   	  	return -1;
   	}
 
-  	// Get DXGPSB readings
+  	// Get Dxgpsb readings
   	for(totalread = 0, nread = 0, tries = 0, maxtries = 24;
 		totalread < NDATA  && tries < maxtries; tries++ ) {
 
@@ -156,7 +156,7 @@ int DXGPSB::readDevice(unsigned char *return_data) {
   return 0;
 }
 
-int DXGPSB::setupPort(const char* port) {
+int Dxgpsb::setupPort(const char* port) {
 
 	int myerrno;
   	struct termios termInfo;
@@ -212,7 +212,7 @@ int DXGPSB::setupPort(const char* port) {
 		//return -1;
   	}	
   	
-  	printf("Connected to a DXGPSB on port: %s\n", port);
+  	printf("Connected to a Dxgpsb on port: %s\n", port);
   	
   	printf("Logging on in standard mode... \n");
   	
@@ -244,14 +244,14 @@ int DXGPSB::setupPort(const char* port) {
 	return 0;
 }
 
-int DXGPSB::update() {
+int Dxgpsb::update() {
 	this->readVelocities();
 	this->sendVelocities();
 	
 	return 0;
 }
 
-int DXGPSB::sendVelocities() {
+int Dxgpsb::sendVelocities() {
 	unsigned char wbuf[24];
 	int wn = 5;
 	
@@ -264,7 +264,7 @@ int DXGPSB::sendVelocities() {
 	writeToDevice(wn, wbuf);
 }
 	
-int DXGPSB::readVelocities() {
+int Dxgpsb::readVelocities() {
 	unsigned char rbuf[24];
 	
 	// Read Joystick
@@ -280,7 +280,7 @@ int DXGPSB::readVelocities() {
 	return 0;
 }
 
-int DXGPSB::setVelocities(float v, float w) {
+int Dxgpsb::setVelocities(float v, float w) {
 
 	this->v_tx = (char)(v * 127.0 + 128.0);
 	this->w_tx = (char)(w * 127.0 + 128.0);
@@ -288,7 +288,7 @@ int DXGPSB::setVelocities(float v, float w) {
 	return 0;
 }
 
-int DXGPSB::setVelocities(char v, char w) {
+int Dxgpsb::setVelocities(char v, char w) {
 
 	this->v_tx = v;
 	this->w_tx = w;
@@ -296,14 +296,14 @@ int DXGPSB::setVelocities(char v, char w) {
 	return 0;
 }
 
-int DXGPSB::getVelocities(char &v, char &w) {
+int Dxgpsb::getVelocities(char &v, char &w) {
 	v = this->v_rx;
 	w = this->w_rx;
 	
 	return 0;
 }
 
-int DXGPSB::getVelocities(float &v, float &w) {
+int Dxgpsb::getVelocities(float &v, float &w) {
 	v = (this->v_rx - 128) / 127.0;
 	w = (this->w_rx - 128) / 128.0;
 	

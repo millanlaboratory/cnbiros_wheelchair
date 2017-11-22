@@ -3,16 +3,16 @@
 
 #include <pthread.h>
 #include <string>
-#include "cnbiros_wheelchair/DXGPSB.hpp"
+#include "cnbiros_wheelchair/Dxgspb.hpp"
 
 namespace cnbiros {
 	namespace wheelchair {
 
-class DXGPSBThread {
+class DxgpsbThread {
 
 	public:
-		DXGPSBThread(const std::string& port = "/dev/ttyUSB0");
-		~DXGPSBThread(void);
+		DxgpsbThread(const std::string& port = "/dev/ttyUSB0");
+		~DxgpsbThread(void);
 
 		int setVelocities(float v, float w);	// v, w E [-1, 1]
 		int setVelocities(char v, char w);		//0x01 = -MAX, 0x80 = 0, 0xFF = +MAX
@@ -23,7 +23,7 @@ class DXGPSBThread {
 		void shutdownThread();
 
 	protected:
-		DXGPSB* dxgpsb;
+		Dxgpsb* dxgpsb;
 		
 	private:	
 		/* Thread stuff */

@@ -27,10 +27,10 @@
 namespace cnbiros {
 	namespace wheelchair {
 
-class DXGPSB {
+class Dxgpsb {
 	public:
-		DXGPSB(const std::string& port = "/dev/ttyUSB0");
-		~DXGPSB(void);
+		Dxgpsb(const std::string& port = "/dev/ttyUSB0");
+		~Dxgpsb(void);
     
 		int setVelocities(float v, float w);	// v, w E [-1, 1]
 		int setVelocities(char v, char w);		//0x01 = -MAX, 0x80 = 0, 0xFF = +MAX

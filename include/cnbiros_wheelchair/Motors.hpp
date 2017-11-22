@@ -10,7 +10,7 @@
 #include "cnbiros_wheelchair/SetVelocity.h"
 #include "cnbiros_wheelchair/GetVelocity.h"
 
-#include "DXGPSBThread.hpp"
+#include "DxgpsbThread.hpp"
 
 #define CNBIROS_WHEELCHAIR_VELOCITY_DEFAULT			 0.5f
 #define CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX		 1.0f
@@ -47,7 +47,7 @@ class Motors : public cnbiros::core::NodeInterface {
 
 	private:
 		ros::Subscriber		rossub_;
-		DXGPSBThread*		dxgpsb_;
+		DxgpsbThread*		dxgpsb_;
 		std::string			port_;
 
 		ros::ServiceServer	rossrv_stop_;

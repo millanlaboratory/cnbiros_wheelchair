@@ -3,17 +3,17 @@
 
 #include <iostream>
 #include <assert.h>
-#include "cnbiros_wheelchair/DXGPSBThread.hpp"
+#include "cnbiros_wheelchair/DxgpsbThread.hpp"
 
 namespace cnbiros {
 	namespace wheelchair {
 
 
-DXGPSBThread::DXGPSBThread(const std::string& port) {
- 	std::cout << "DXGPSBRT: CALLED" << std::endl;
+DxgpsbThread::DxgpsbThread(const std::string& port) {
+ 	std::cout << "DxgpsbRT: CALLED" << std::endl;
 
 	try {
-		this->dxgpsb = new DXGPSB(port);
+		this->dxgpsb = new Dxgpsb(port);
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(e.what());
 	}
@@ -22,11 +22,11 @@ DXGPSBThread::DXGPSBThread(const std::string& port) {
 	this->startThread();
 }
 
-DXGPSBThread::~DXGPSBThread(void) {
+DxgpsbThread::~DxgpsbThread(void) {
 	pthread_mutex_destroy(&this->mtx);
 }
 
-void DXGPSBThread::startThread() {
+void DxgpsbThread::startThread() {
 	pthread_mutex_lock(&this->mtx);
 	assert(!this->run);
 	this->run = true;
@@ -35,8 +35,8 @@ void DXGPSBThread::startThread() {
 	pthread_mutex_unlock(&this->mtx);
 }
 
-void DXGPSBThread::shutdownThread() {
-	std::cout << "Killing DXGPSBThread" << std::endl;
+void DxgpsbThread::shutdownThread() {
+	std::cout << "Killing DxgpsbThread" << std::endl;
 
 	// notify the thread to stop
 	pthread_mutex_lock(&this->mtx);
@@ -48,10 +48,10 @@ void DXGPSBThread::shutdownThread() {
 }
 
 
-void* DXGPSBThread::runThread(void* data) {
+void* DxgpsbThread::runThread(void* data) {
 	char v, w;
 	bool bquit = false;
-	DXGPSBThread* dxth = (DXGPSBThread*)data;
+	DxgpsbThread* dxth = (DxgpsbThread*)data;
 
 	while (!bquit) {
 		// Read current values from sensors
@@ -79,7 +79,7 @@ void* DXGPSBThread::runThread(void* data) {
 	return NULL;
 }
 
-int DXGPSBThread::setVelocities(float v, float w) {
+int DxgpsbThread::setVelocities(float v, float w) {
 	pthread_mutex_lock(&this->mtx);
 		this->v_tx = (char)(v * 127.0 + 128.0);
 		this->w_tx = (char)(w * 127.0 + 128.0);
@@ -88,7 +88,7 @@ int DXGPSBThread::setVelocities(float v, float w) {
 	return 0;
 }
 
-int DXGPSBThread::setVelocities(char v, char w) {
+int DxgpsbThread::setVelocities(char v, char w) {
 
 	pthread_mutex_lock(&this->mtx);
 		this->v_tx = v;
@@ -97,7 +97,7 @@ int DXGPSBThread::setVelocities(char v, char w) {
 	return 0;
 }
 
-int DXGPSBThread::getVelocities(char &v, char &w) {
+int DxgpsbThread::getVelocities(char &v, char &w) {
 	pthread_mutex_lock(&this->mtx);
 		v = this->v_rx;
 		w = this->w_rx;
@@ -106,7 +106,7 @@ int DXGPSBThread::getVelocities(char &v, char &w) {
 	return 0;
 }
 
-int DXGPSBThread::getVelocities(float &v, float &w) {
+int DxgpsbThread::getVelocities(float &v, float &w) {
 	pthread_mutex_lock(&this->mtx);
 		v = (this->v_rx - 128) / 127.0;
 		w = (this->w_rx - 128) / 128.0;
