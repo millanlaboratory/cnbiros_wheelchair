@@ -7,7 +7,11 @@
 	<node name="SonarsLeft" pkg="cnbiros_wheelchair" type="ros_wheelchair_ultrasonics" output="screen">
 		<rosparam command="load" file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_ultrasonics_left.yaml"/>
 	</node>	
-	<!-- <include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_motors.launch" /> -->
+	
+	<!-- *********** Motors ***************** -->	
+	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_motors.launch">
+		<arg name="port" value="/dev/ttyUSB2" />
+	</include>
 	
 	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
 	<node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
