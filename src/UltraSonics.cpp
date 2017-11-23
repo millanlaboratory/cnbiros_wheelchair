@@ -22,11 +22,10 @@ UltraSonics::UltraSonics(ros::NodeHandle* node, unsigned int nsonars, std::strin
 	this->ranges_.assign(this->nsonars_, 0);
 
 	// Initialize message
-	this->msonar_.header.frame_id = "tobedone";
 	this->msonar_.radiation_type = 0;
 	this->msonar_.field_of_view = 0.52; // +/- 30 degrees
 	this->msonar_.min_range = 0.06f;
-	this->msonar_.max_range = 0.60f;
+	this->msonar_.max_range = 2.00f;
 	
 
 	// Initialize publishers
@@ -107,7 +106,9 @@ void UltraSonics::onRunning(void) {
 	if(this->GetRanges(this->ranges_) != -1) {
 		
 		for(auto it=this->rospubs_.begin(); it!=this->rospubs_.end(); ++it) {
-
+			std::stringstream ss;
+			ss << "sonar_0x" << std::hex << (int)this->addresses_.at(sonarId) << "_link";
+			this->msonar_.header.frame_id = ss.str();
 			this->msonar_.range = (float)(this->ranges_.at(sonarId)/100.0f);
 
 			(*it).publish(this->msonar_);
