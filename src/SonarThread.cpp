@@ -97,6 +97,17 @@ int SonarThread::getReadings(int range[])
 	return ret;
 }
 
+int SonarThread::setAnalogueGain(unsigned char addr, unsigned char gain) {
+	
+	int retcode;
+	pthread_mutex_lock(&this->mtx);
+	retcode = this->sr->setAnalogueGain(addr, gain);
+	pthread_mutex_unlock(&this->mtx);
+
+	return retcode;
+}
+	
+
 	}
 }
 

@@ -4,16 +4,22 @@
 int main (int argc, char** argv) {
 
 	std::string port;
+	unsigned char taddr;
+	std::vector<int> iaddr;
+	std::vector<unsigned char> addr;
 
 	ros::init(argc, argv, "sonars");
 	ros::NodeHandle node;
 
-	cnbiros::wheelchair::UltraSonics sonars(&node, 2);
-	//cnbiros::wheelchair::UltraSonics sonars(&node, {0xe0, 0xf2});
-	sonars.SetRate(50);
-
 	ros::param::get("~port", port);
+	ros::param::get("~addresses", iaddr);
 
+	for(auto it=iaddr.begin(); it!=iaddr.end(); ++it) {
+		addr.push_back(static_cast<unsigned char>((*it)));
+	}
+
+	cnbiros::wheelchair::UltraSonics sonars(&node, addr);
+	sonars.SetRate(50);
 
 	try{
 		sonars.Open(port);
@@ -25,6 +31,7 @@ int main (int argc, char** argv) {
 
 	sonars.Run();
 
+	ros::shutdown();
 
 	return 0;
 }

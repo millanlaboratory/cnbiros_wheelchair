@@ -22,6 +22,7 @@ class SonarThread {
 		~SonarThread();
 
 		int getReadings(int range[]);
+		int setAnalogueGain(unsigned char addr, unsigned char gain);
 
 		void startThread();
 		void shutdownThread();

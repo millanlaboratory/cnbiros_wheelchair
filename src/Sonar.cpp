@@ -40,7 +40,12 @@ Sonar::Sonar(const char* port, int n_sonar,
 		for (int i = 0; i < N_SONAR; i++){
 			this->setAnalogueGain(this->address_book[i], max_gains[i]);
 		}
+	} else {
+		for (int i = 0; i < N_SONAR; i++){
+			this->setAnalogueGain(this->address_book[i], 0x10);
+		}
 	}
+
 	
 }
 
@@ -185,12 +190,10 @@ int Sonar::setAnalogueGain(unsigned char addr, unsigned char gain)
 	nwritten = write( this->fd, sbuf, 5 );
 	
 	tcflush( fd, TCIFLUSH );		
-	
+
 	if ( nwritten != 5 ) {
 		throw std::runtime_error("Failed to set analogue gain to " + std::to_string(gain) + " for sonar " + std::to_string(addr));
 		return -1;
-	} else {
-	  printf( "Analogue gain set to %d for sonar %d\n", (int) gain, (int) addr );
 	}
 	
 	return 0;

@@ -25,7 +25,7 @@ UltraSonics::UltraSonics(ros::NodeHandle* node, unsigned int nsonars, std::strin
 	this->msonar_.radiation_type = 0;
 	this->msonar_.field_of_view = 0.52; // +/- 30 degrees
 	this->msonar_.min_range = 0.06f;
-	this->msonar_.max_range = 2.00f;
+	this->msonar_.max_range = 6.00f;
 	
 
 	// Initialize publishers
@@ -44,6 +44,16 @@ UltraSonics::UltraSonics(ros::NodeHandle* node, const std::vector<unsigned char>
 	this->addresses_ = addresses;
 	this->nsonars_  = this->addresses_.size();
 	
+	// Initialize ranges
+	this->ranges_.resize(this->nsonars_);
+	this->ranges_.assign(this->nsonars_, 0);
+
+	// Initialize message
+	this->msonar_.radiation_type = 0;
+	this->msonar_.field_of_view = 0.52; // +/- 30 degrees
+	this->msonar_.min_range = 0.06f;
+	this->msonar_.max_range = 6.00f;
+	
 	// Initialize publishers
 	this->setup_publishers(node, name);
 
@@ -57,6 +67,7 @@ UltraSonics::~UltraSonics(void) {
 int UltraSonics::Open(const std::string& port) {
 
 	int retcod = 0;
+	std::string saddr;
 
 	this->port_ = port;
 	try {
@@ -65,13 +76,22 @@ int UltraSonics::Open(const std::string& port) {
 		throw std::runtime_error(e.what());
 	}
 
+	for(auto it=this->addresses_.begin(); it!=this->addresses_.end(); ++it) {
+		std::stringstream ss;
+		ss << "0x" << std::hex << (int)(*it);
+		saddr += ss.str() + " ";
+	}
+
+	ROS_INFO("USB port %s opened. %d ultrasound sensors registered: %s", 
+			 this->port_.c_str(), this->nsonars_, saddr.c_str());
+
 	return retcod;
 
 }
 
 int UltraSonics::GetRanges(std::vector<int>& ranges) {
 
-	int retcode;
+	int retcode = -1;
 	int cranges[this->nsonars_];
 
 	if(this->sonars_ != nullptr) {
@@ -83,6 +103,35 @@ int UltraSonics::GetRanges(std::vector<int>& ranges) {
 
 
 	return retcode;
+}
+
+int UltraSonics::SetGain(unsigned char gain, unsigned char address) {
+	int retcode = -1;
+	std::stringstream ssa, ssg;
+	
+	if(this->sonars_ !=nullptr) {
+		retcode = this->sonars_->setAnalogueGain(address, gain);
+	}
+	
+	ssa << "0x" << std::hex << (int)address;
+	ssg << "0x" << std::hex << (int)gain;
+
+	if(retcode != -1) {
+		ROS_INFO("Gain set at %s for sensor %s", ssg.str().c_str(), ssa.str().c_str());
+	} else {
+		ROS_WARN("Cannot set the gain for sensor %s", ssa.str().c_str());
+	}
+
+	return retcode;
+}
+
+int UltraSonics::SetGain(unsigned char gain) {
+
+	for(auto it=this->addresses_.begin(); it!=this->addresses_.end(); ++it) {
+		this->SetGain(gain, (*it));
+	}
+	
+	return 0;
 }
 
 void UltraSonics::setup_publishers(ros::NodeHandle* node, std::string basename) {
@@ -101,7 +150,6 @@ void UltraSonics::onRunning(void) {
 	unsigned int sonarId = 0;
 	int crange;
 
-	this->msonar_.header.stamp = ros::Time::now();
 
 	if(this->GetRanges(this->ranges_) != -1) {
 		
@@ -109,6 +157,7 @@ void UltraSonics::onRunning(void) {
 			std::stringstream ss;
 			ss << "sonar_0x" << std::hex << (int)this->addresses_.at(sonarId) << "_link";
 			this->msonar_.header.frame_id = ss.str();
+			this->msonar_.header.stamp = ros::Time::now();
 			this->msonar_.range = (float)(this->ranges_.at(sonarId)/100.0f);
 
 			(*it).publish(this->msonar_);

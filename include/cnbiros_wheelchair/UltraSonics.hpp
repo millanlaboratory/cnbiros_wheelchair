@@ -24,7 +24,8 @@ class UltraSonics : public cnbiros::core::NodeInterface {
 
 		int Open(const std::string& port);
 
-		int SetGain(const std::string& gain, const std::string& address);
+		int SetGain(unsigned char gain, unsigned char address);
+		int SetGain(unsigned char gain);
 		int GetRanges(std::vector<int>& ranges);
 
 		void onRunning(void);
