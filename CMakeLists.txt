@@ -37,6 +37,8 @@ add_library(cnbiros_wheelchair
 			src/Dxgpsb.cpp
 			src/DxgpsbThread.cpp
 			src/Motors.cpp
+			src/Encoder.cpp
+			src/EncoderThread.cpp
 			src/Sonar.cpp
 			src/SonarThread.cpp
 			src/UltraSonics.cpp)
