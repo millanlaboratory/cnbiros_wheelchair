@@ -1,0 +1,20 @@
+# Ultrasonic sensors parameters
+
+port: /dev/ttyACM0
+addresses:
+    - 0xe0
+    - 0xe2
+    - 0xe4
+    - 0xe6
+    - 0xe8
+
+#Left:
+#  port: /dev/ttyACM1
+#  addresses:
+#      - 0xea
+#      - 0xec
+#      - 0xee
+#      - 0xf0
+#      - 0xf2
+#
+
