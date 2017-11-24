@@ -1,11 +1,8 @@
-/* CNBI Wheelencoder test program
- * 
- * 15.09.2010, tom.carlson@epfl.ch 
- *
- */
+#include "cnbiros_wheelchair/EncoderThread.hpp"
 
-//#include "CNBIWheelEncoder.h"
-#include "CNBIWheelEncoderThread.h"
+void usage( char *x ) {
+	printf( "usage: %s /dev/ttyUSB0 /dev/ttyUSB1\n", x );
+}
 
 int main( int argc, char *argv[] ) 
 {
@@ -13,9 +10,16 @@ int main( int argc, char *argv[] )
 	
 	
 	printf("CNBI wheel encoder test program\n");
-  
-	CNBIWheelEncoderThread encright("/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A700eiPG-if00-port0");
-	CNBIWheelEncoderThread encleft("/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A700eiPs-if00-port0");
+ 
+	if (argc != 3) {
+		printf("please provide 2 aurguments\n");
+		usage(argv[0]);
+		return EINVAL;
+	}
+
+
+	cnbiros::wheelchair::EncoderThread encright(argv[1]);
+	cnbiros::wheelchair::EncoderThread encleft(argv[2]);
 	
 	for (;;){
  		dl = encleft.getDelta();
