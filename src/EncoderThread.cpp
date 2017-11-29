@@ -58,16 +58,16 @@ void* EncoderThread::runThread(void* data)
 	while (!bquit) {
 		// Read the wheel encoder
 		d = encth->enc->readEncoder();
-		
+	
 		//HACK to supress spurious readings
- 		if ((d > 60) || (d < -60))
+ 		if ((d > 100) || (d < -100))
 			d = 0;
 		
 		pthread_mutex_lock(&encth->mtx);
 		encth->delta += d;
 		encth->seq++;
 		bquit = !encth->run;
-		pthread_mutex_lock(&encth->mtx);
+		pthread_mutex_unlock(&encth->mtx);
 	}
 
 	return NULL;
