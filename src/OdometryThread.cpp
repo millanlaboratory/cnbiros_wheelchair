@@ -26,6 +26,25 @@ OdometryThread::OdometryThread(const std::string& lport, const std::string& rpor
 	this->startThread();
 }
 
+OdometryThread::OdometryThread(const std::string& lport, const std::string& rport, 
+					   double axle, double dwheel, int revcount, bool invert_left_wheel) 
+{
+	this->enc_left = new EncoderThread(lport);
+	this->enc_right = new EncoderThread(rport);
+		
+	this->x = 0;
+	this->y = 0;
+	this->theta = 0;
+	
+	this->axle = axle;
+	this->dwheel = dwheel;
+	this->revcount = revcount;
+	
+	this->invert = invert_left_wheel;
+	pthread_mutex_init(&this->mtx, NULL);
+
+	this->startThread();
+}
 OdometryThread::~OdometryThread()
 {
 	this->shutdownThread();
@@ -68,7 +87,8 @@ void* OdometryThread::runThread(void* data)
 	
 	double mag = 0.0;
 	bool bquit = false;
-	
+
+	double revl=0, revr=0;
 	
 	while (1) {
 		pthread_mutex_lock(&odoth->mtx);
@@ -77,12 +97,23 @@ void* OdometryThread::runThread(void* data)
 		pthread_mutex_unlock(&odoth->mtx);
 		if (bquit)
 			break;
-		
- 		dl = d * odoth->enc_left->getDelta(lseq);
- 		dr = d * odoth->enc_right->getDelta(rseq);
+	
+
+		revl = odoth->enc_left->getDelta(lseq) / odoth->revcount;
+		revr = odoth->enc_right->getDelta(rseq) / odoth->revcount;
+
+		dl = revl*(odoth->dwheel*M_PI);
+		dr = revr*(odoth->dwheel*M_PI);
+
 		if (odoth->invert){
 			dl *= -1;
 		}
+
+ 		//dl = d * odoth->enc_left->getDelta(lseq);
+ 		//dr = d * odoth->enc_right->getDelta(rseq);
+		//if (odoth->invert){
+		//	dl *= -1;
+		//}
 		//printf("Delta (left, right) ( % 3.0f, % 3.0f )\n", dl, dr);
 		//printf("Delta (left, right, lseq, rseq) ( % 3.0f, % 3.0f, %d, %d)\n", dl, dr, lseq, rseq);
 		

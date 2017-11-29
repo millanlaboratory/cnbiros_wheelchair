@@ -20,6 +20,8 @@ class OdometryThread {
 	public:
 		OdometryThread(const std::string& lport, const std::string& rport, 
 					   double axle_width, double delta, bool invert_left_wheel = true);
+		OdometryThread(const std::string& lport, const std::string& rport, 
+					   double axle, double dwheel, int revcount, bool invert_left_wheel = true);
 		~OdometryThread();
 
 		/* Manage the thread start/stop */
@@ -46,7 +48,9 @@ class OdometryThread {
 		
 		double x, y, theta;			/* Estimated position from odometry data */
 		double axle, resolution;	/* axle = axle width, resolution = delta */
-		
+		int		revcount;			/* Number of counts in one revolution */
+		double	dwheel;				/* Wheel diameter */
+
 		bool invert;
 		
 };

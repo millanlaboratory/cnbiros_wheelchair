@@ -10,7 +10,6 @@ void usage( char *x ) {
 
 int main( int argc, char *argv[] ) 
 {
-	double dl = 0.0, dr = 0.0;
 
 	double resolution;
 	double x, y, theta;
@@ -24,9 +23,9 @@ int main( int argc, char *argv[] )
 	}
 
 
-	resolution = (float(WHEEL_DIAMETER)*M_PI)/float(WHEEL_REVOLUTION_COUNTS);
 
-	cnbiros::wheelchair::OdometryThread odometry(argv[1], argv[2], WHEEL_AXLE, resolution);
+	cnbiros::wheelchair::OdometryThread odometry(argv[1], argv[2], 
+						WHEEL_AXLE, WHEEL_DIAMETER, WHEEL_REVOLUTION_COUNTS);
 
 	
 	for (;;){
