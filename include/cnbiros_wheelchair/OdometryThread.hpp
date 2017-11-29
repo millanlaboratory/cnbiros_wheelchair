@@ -1,13 +1,16 @@
 #ifndef CNBIROS_WHEELCHAIR_ODOMETRY_THREAD_HPP
 #define CNBIROS_WHEELCHAIR_ODOMETRY_THREAD_HPP
 
-#include <boost/thread.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/condition.hpp>
-#include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
+#include <pthread.h>
+#include <iostream>
+#include <assert.h>
+#include <math.h>
 
 #include "cnbiros_wheelchair/EncoderThread.hpp"
+
+#ifndef RAD2DEG
+#define RAD2DEG(x) ((x) * 180 / M_PI)
+#endif
 
 namespace cnbiros {
 	namespace wheelchair {
@@ -15,28 +18,36 @@ namespace cnbiros {
 class OdometryThread {
 
 	public:
-		OdometryThread(const std::string& lport = "/dev/ttyUSB0", 
-					   const std::string& rport = "/dev/ttyUSB1");
+		OdometryThread(const std::string& lport, const std::string& rport, 
+					   double axle_width, double delta, bool invert_left_wheel = true);
 		~OdometryThread();
 
-		int getOdometry(double *x, double *y, double *theta);
-
+		/* Manage the thread start/stop */
 		void startThread();
 		void shutdownThread();
+		
+		/* Interaction functions */
+		int getOdometry(double *x, double *y, double *theta);
+		int setOdometry(double x, double y, double theta);
+		int shiftOdometry(double x, double y);
+		int resetOdometry();
+		
 
 	private:	
-	/* Thread stuff */
-		void runThread();
-		volatile bool run;
-		volatile bool quit;
-		boost::shared_ptr<boost::thread> odothread;
-		boost::mutex mtx;
-		boost::condition cond;
+		/* Thread stuff */
+		static void* runThread(void*);
+		bool run;
+		pthread_t odothread;
+		pthread_mutex_t mtx;
 
-		EncoderThread *lenc;
-		EncoderThread *renc;
+		/* Encoder stuff */
+		EncoderThread *enc_right;
+		EncoderThread *enc_left;
 		
-		double x, y, theta;
+		double x, y, theta;			/* Estimated position from odometry data */
+		double axle, resolution;	/* axle = axle width, resolution = delta */
+		
+		bool invert;
 		
 };
 

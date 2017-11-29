@@ -39,6 +39,7 @@ add_library(cnbiros_wheelchair
 			src/Motors.cpp
 			src/Encoder.cpp
 			src/EncoderThread.cpp
+			src/OdometryThread.cpp
 			src/Sonar.cpp
 			src/SonarThread.cpp
 			src/UltraSonics.cpp)
@@ -65,6 +66,10 @@ target_link_libraries(example_encoder_pair cnbiros_wheelchair)
 add_executable(example_encoder_single examples/example_encoder_single.cpp)
 add_dependencies(example_encoder_single cnbiros_wheelchair_generate_messages_cpp)
 target_link_libraries(example_encoder_single cnbiros_wheelchair)
+
+add_executable(example_odometry examples/example_odometry.cpp)
+add_dependencies(example_odometry cnbiros_wheelchair_generate_messages_cpp)
+target_link_libraries(example_odometry cnbiros_wheelchair)
 
 add_executable(ros_wheelchair_motors src/ros_wheelchair_motors.cpp)
 add_dependencies(ros_wheelchair_motors cnbiros_wheelchair_generate_messages_cpp)
