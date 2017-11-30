@@ -7,6 +7,7 @@ void usage( char *x ) {
 int main( int argc, char *argv[] ) 
 {
 	double counts = 0.0;
+	int sequence = 0;
 	
 	
 	printf("CNBI wheel encoder test program\n");
@@ -21,8 +22,8 @@ int main( int argc, char *argv[] )
 	cnbiros::wheelchair::EncoderThread encoder(argv[1]);
 	
 	for (;;){
-		counts = encoder.getDelta();
-		printf("Counts on %s: % 3.0f\n", argv[1], counts);
+		counts = encoder.getDelta(sequence);
+		printf("Counts on %s: % 3.0f - Sequence %d\n", argv[1], counts, sequence);
 			
 		//printf("%4f\n", enc_thread1.getDelta());
 			
