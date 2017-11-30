@@ -5,6 +5,7 @@
 #include <iostream>
 #include <assert.h>
 #include <math.h>
+#include <chrono>
 
 #include "cnbiros_wheelchair/EncoderThread.hpp"
 
@@ -21,7 +22,8 @@ class OdometryThread {
 		OdometryThread(const std::string& lport, const std::string& rport, 
 					   double axle_width, double delta, bool invert_left_wheel = true);
 		OdometryThread(const std::string& lport, const std::string& rport, 
-					   double axle, double dwheel, int revcount, bool invert_left_wheel = true);
+					   double axle, double diameter, int revolution, 
+					   bool invert_left_wheel = true);
 		~OdometryThread();
 
 		/* Manage the thread start/stop */
@@ -47,9 +49,14 @@ class OdometryThread {
 		EncoderThread *enc_left;
 		
 		double x, y, theta;			/* Estimated position from odometry data */
-		double axle, resolution;	/* axle = axle width, resolution = delta */
-		int		revcount;			/* Number of counts in one revolution */
-		double	dwheel;				/* Wheel diameter */
+		double	resolution;	/* axle = axle width, resolution = delta */
+
+
+		double	axle;			// Distance between wheels [m]
+		double	diameter;		// Diameter of the wheel [m]
+		int		revolution;		// Number of thicks for one wheel revolution
+
+		double	DistancePerCount;
 
 		bool invert;
 		

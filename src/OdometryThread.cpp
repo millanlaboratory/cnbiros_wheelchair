@@ -27,7 +27,8 @@ OdometryThread::OdometryThread(const std::string& lport, const std::string& rpor
 }
 
 OdometryThread::OdometryThread(const std::string& lport, const std::string& rport, 
-					   double axle, double dwheel, int revcount, bool invert_left_wheel) 
+							   double axle, double diameter, int revolution, 
+							   bool invert_left_wheel) 
 {
 	this->enc_left = new EncoderThread(lport);
 	this->enc_right = new EncoderThread(rport);
@@ -36,13 +37,15 @@ OdometryThread::OdometryThread(const std::string& lport, const std::string& rpor
 	this->y = 0;
 	this->theta = 0;
 	
-	this->axle = axle;
-	this->dwheel = dwheel;
-	this->revcount = revcount;
-	
-	this->invert = invert_left_wheel;
-	pthread_mutex_init(&this->mtx, NULL);
+	this->axle			= axle;
+	this->diameter		= diameter;
+	this->revolution	= revolution;
+	this->invert		= invert_left_wheel;
 
+	/* 2*PI*radius / NumberOfCountsInARevolution */
+	this->DistancePerCount = (2.0f * M_PI * (this->diameter / 2.0f)) / (double)this->revolution;
+
+	pthread_mutex_init(&this->mtx, NULL);
 	this->startThread();
 }
 OdometryThread::~OdometryThread()
@@ -77,6 +80,77 @@ void OdometryThread::shutdownThread()
 void* OdometryThread::runThread(void* data)
 {
 	OdometryThread* odoth = (OdometryThread*)data;
+	bool bquit = false;
+
+	double deltaLeft  = 0.0f, deltaRight = 0.0f;
+	double velLeft, velRight;
+	double velx, vely, velth;
+	double deltax, deltay, deltath;
+
+	double DistancePerCount = odoth->DistancePerCount;
+	double axle = odoth->axle;
+	double theta = odoth->theta;
+
+	std::chrono::high_resolution_clock::time_point ctime;
+	std::chrono::high_resolution_clock::time_point ptime;
+	std::chrono::milliseconds elapsed;
+
+	ptime = std::chrono::high_resolution_clock::now();
+	
+	while (1) {
+		// Get current elapsed time
+		ctime	= std::chrono::high_resolution_clock::now();
+		elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(ctime-ptime);
+		ptime   = ctime;
+
+		pthread_mutex_lock(&odoth->mtx);
+		bquit = !odoth->run;
+		pthread_mutex_unlock(&odoth->mtx);
+		
+		if (bquit)
+			break;
+	
+		// Get current encoders readings
+		deltaLeft  = odoth->enc_left->getDelta();
+		deltaRight = odoth->enc_right->getDelta();
+		
+		if (odoth->invert) 
+			deltaLeft *= -1;
+		
+		// Get wheel velocities - DeltaCount*DistancePerCount/Time
+		velLeft  = (deltaLeft*DistancePerCount)  / (double)elapsed.count() / 1000.0f;
+		velRight = (deltaRight*DistancePerCount) / (double)elapsed.count() / 1000.0f;
+
+		// Transform wheel velocity in world coordinates
+		velx  = ((velRight + velLeft) / 2.0f);
+		vely  = 0.0f;
+		velth = (velRight - velLeft) / axle;
+
+		// Get current theta
+		pthread_mutex_lock(&odoth->mtx);
+		theta = odoth->theta;
+		pthread_mutex_unlock(&odoth->mtx);
+
+		// Transform wheel counts in delta distances
+		deltax  = (velx * cos(theta)) * (double)elapsed.count() / 1000.0f;
+		deltay  = (velx * sin(theta)) * (double)elapsed.count() / 1000.0f;
+		deltath = velth * (double)elapsed.count() / 1000.0f;
+
+		// Update x, y, theta
+		pthread_mutex_lock(&odoth->mtx);
+		odoth->x += deltax;
+		odoth->y -= deltay;
+		odoth->theta += deltath;
+		pthread_mutex_unlock(&odoth->mtx);
+
+		usleep(20000);
+	}
+}
+
+/*
+void* OdometryThread::runThread(void* data)
+{
+	OdometryThread* odoth = (OdometryThread*)data;
 	double dl = 0, dr = 0;
 	int lseq = 0, rseq = 0;
 	double b = odoth->axle;
@@ -89,7 +163,8 @@ void* OdometryThread::runThread(void* data)
 	bool bquit = false;
 
 	double revl=0, revr=0;
-	
+
+
 	while (1) {
 		pthread_mutex_lock(&odoth->mtx);
 		ltheta = odoth->theta;
@@ -99,11 +174,9 @@ void* OdometryThread::runThread(void* data)
 			break;
 	
 
-		revl = odoth->enc_left->getDelta(lseq) / odoth->revcount;
-		revr = odoth->enc_right->getDelta(rseq) / odoth->revcount;
+		dl = odoth->enc_left->getDelta(lseq) * odoth->DistancePerCount;
+		dr = odoth->enc_right->getDelta(rseq) * odoth->DistancePerCount;
 
-		dl = revl*(odoth->dwheel*M_PI);
-		dr = revr*(odoth->dwheel*M_PI);
 
 		if (odoth->invert){
 			dl *= -1;
@@ -144,7 +217,7 @@ void* OdometryThread::runThread(void* data)
 	}
 }
 
-
+*/
 int OdometryThread::getOdometry(double *x, double *y, double *theta)
 {
 	pthread_mutex_lock(&this->mtx);
