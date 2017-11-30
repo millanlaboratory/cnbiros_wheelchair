@@ -15,8 +15,8 @@ int main (int argc, char** argv) {
 	ros::init(argc, argv, "odometry");
 	ros::NodeHandle node;
 
-	ros::param::get("~leftport",  lport);
-	ros::param::get("~rightport", rport);
+	ros::param::get("~lport",  lport);
+	ros::param::get("~rport", rport);
 	ros::param::get("~axle", axle);
 	ros::param::get("~diameter", diameter);
 	ros::param::get("~revolution", revolution);
