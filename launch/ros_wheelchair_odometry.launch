@@ -1,0 +1,15 @@
+<launch>
+	<arg name="lport" default="/dev/ttyUSB0" />
+	<arg name="rport" default="/dev/ttyUSB2" />
+	<arg name="axle" default="0.5240" />
+	<arg name="diameter" default="0.3556" />
+	<arg name="revolution" default="280" />
+	<node name="odometry" pkg="cnbiros_wheelchair" type="ros_wheelchair_odometry" output="screen">
+		<param name="lport" value="$(arg lport)" />
+		<param name="rport" value="$(arg rport)" />
+		<param name="axle" value="$(arg axle)" />
+		<param name="diameter" value="$(arg diameter)" />
+		<param name="revolution" value="$(arg revolution)" />
+	</node>
+</launch>
+

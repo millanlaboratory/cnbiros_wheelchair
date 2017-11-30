@@ -11,9 +11,9 @@ void usage( char *x ) {
 int main( int argc, char *argv[] ) 
 {
 
-	double resolution;
 	double x, y, theta;
-	
+	double vx, vy, vtheta;
+
 	printf("CNBI odometry test program\n");
  
 	if (argc != 3) {
@@ -23,15 +23,16 @@ int main( int argc, char *argv[] )
 	}
 
 
-
 	cnbiros::wheelchair::OdometryThread odometry(argv[1], argv[2], 
 						WHEEL_AXLE, WHEEL_DIAMETER, WHEEL_REVOLUTION_COUNTS);
-
 	
 	for (;;){
 		
-		odometry.getOdometry(&x, &y, &theta);
-		printf("Position (x, y, theta)=> (%3.2f, %3.2f, %3.2f) [m, m, deg]\n", x, y, theta*180.0f / M_PI);
+		odometry.getOdometry(&x, &y, &theta, &vx, &vy, &vtheta);
+		printf("Position (x,   y,  theta)=> (%3.2f, %3.2f, %3.2f) [m, m, deg]\n", 
+				x, y, theta*180.0f / M_PI);
+		printf("Velocity (vx, vy, vtheta)=> (%3.2f, %3.2f, %3.2f) [m/s, m/s, deg/s]\n", 
+				vx, vy, vtheta*180.0f / M_PI);
 			
 		usleep(100000);
 	}

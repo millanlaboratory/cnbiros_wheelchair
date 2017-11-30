@@ -2,7 +2,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 cmake_minimum_required(VERSION 2.8.3)
 project(cnbiros_wheelchair)
 
-find_package(catkin REQUIRED COMPONENTS roscpp message_generation std_msgs sensor_msgs nav_msgs geometry_msgs cnbiros_core)
+find_package(catkin REQUIRED COMPONENTS roscpp message_generation std_msgs sensor_msgs nav_msgs geometry_msgs cnbiros_core tf)
 
 SET(CMAKE_BUILD_TYPE RelWithDebInfo)
 
@@ -40,6 +40,7 @@ add_library(cnbiros_wheelchair
 			src/Encoder.cpp
 			src/EncoderThread.cpp
 			src/OdometryThread.cpp
+			src/Odometry.cpp
 			src/Sonar.cpp
 			src/SonarThread.cpp
 			src/UltraSonics.cpp)
@@ -74,6 +75,10 @@ target_link_libraries(example_odometry cnbiros_wheelchair)
 add_executable(ros_wheelchair_motors src/ros_wheelchair_motors.cpp)
 add_dependencies(ros_wheelchair_motors cnbiros_wheelchair_generate_messages_cpp)
 target_link_libraries(ros_wheelchair_motors cnbiros_wheelchair)
+
+add_executable(ros_wheelchair_odometry src/ros_wheelchair_odometry.cpp)
+add_dependencies(ros_wheelchair_odometry cnbiros_wheelchair_generate_messages_cpp)
+target_link_libraries(ros_wheelchair_odometry cnbiros_wheelchair)
 
 add_executable(ros_wheelchair_ultrasonics src/ros_wheelchair_ultrasonics.cpp)
 add_dependencies(ros_wheelchair_ultrasonics cnbiros_wheelchair_generate_messages_cpp)

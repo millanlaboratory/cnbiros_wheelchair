@@ -9,9 +9,8 @@
 
 #include "cnbiros_wheelchair/EncoderThread.hpp"
 
-#ifndef RAD2DEG
-#define RAD2DEG(x) ((x) * 180 / M_PI)
-#endif
+#define CNBIROS_WHEELCHAIR_ODOMETRY_THREAD_SLEEP	20000	// [us] Wait period in the main
+															//		thread cycle
 
 namespace cnbiros {
 	namespace wheelchair {
@@ -20,22 +19,23 @@ class OdometryThread {
 
 	public:
 		OdometryThread(const std::string& lport, const std::string& rport, 
-					   double axle_width, double delta, bool invert_left_wheel = true);
-		OdometryThread(const std::string& lport, const std::string& rport, 
 					   double axle, double diameter, int revolution, 
 					   bool invert_left_wheel = true);
-		~OdometryThread();
+		virtual ~OdometryThread(void);
 
-		/* Manage the thread start/stop */
-		void startThread();
-		void shutdownThread();
 		
 		/* Interaction functions */
-		int getOdometry(double *x, double *y, double *theta);
+		int getOdometry(double *x, double *y, double *theta,
+						double *vx = nullptr, double *vy = nullptr, 
+						double *vth = nullptr);
 		int setOdometry(double x, double y, double theta);
 		int shiftOdometry(double x, double y);
-		int resetOdometry();
-		
+		int resetOdometry(void);
+	
+	private:
+		/* Manage the thread start/stop */
+		void startThread(void);
+		void shutdownThread(void);
 
 	private:	
 		/* Thread stuff */
@@ -48,17 +48,23 @@ class OdometryThread {
 		EncoderThread *enc_right;
 		EncoderThread *enc_left;
 		
-		double x, y, theta;			/* Estimated position from odometry data */
-		double	resolution;	/* axle = axle width, resolution = delta */
+		/* Estimated position from odometry data */
+		double x;
+		double y; 
+		double theta;			
 
+		/* Estimated velocity from odometry data */
+		double vx;
+		double vy;
+		double vtheta;
 
+		/* Wheelchair parameters */
+		bool	invert;			// Invert counts read by left encoder
 		double	axle;			// Distance between wheels [m]
 		double	diameter;		// Diameter of the wheel [m]
 		int		revolution;		// Number of thicks for one wheel revolution
-
 		double	DistancePerCount;
 
-		bool invert;
 		
 };
 
