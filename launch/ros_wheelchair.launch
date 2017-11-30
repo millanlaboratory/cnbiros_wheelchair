@@ -10,7 +10,7 @@
 	
 	<!-- *********** Motors ***************** -->	
 	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_motors.launch">
-		<arg name="port" value="/dev/ttyUSB2" />
+		<arg name="port" value="/dev/ttyUSB1" />
 	</include>
 	
 	<!-- *********** Transformation ***************** -->	

@@ -13,9 +13,9 @@ OdometryThread::OdometryThread(const std::string& lport, const std::string& rpor
 	this->enc_left = new EncoderThread(lport);
 	this->enc_right = new EncoderThread(rport);
 		
-	this->x = 0;
-	this->y = 0;
-	this->theta = 0;
+	this->x = 0.0f;
+	this->y = 0.0f;
+	this->theta = 0.0f;
 	
 	this->axle = axle_width;
 	this->resolution = delta;
@@ -33,9 +33,9 @@ OdometryThread::OdometryThread(const std::string& lport, const std::string& rpor
 	this->enc_left = new EncoderThread(lport);
 	this->enc_right = new EncoderThread(rport);
 		
-	this->x = 0;
-	this->y = 0;
-	this->theta = 0;
+	this->x = 0.0f;
+	this->y = 0.0f;
+	this->theta = 0.0f;
 	
 	this->axle			= axle;
 	this->diameter		= diameter;
@@ -48,6 +48,7 @@ OdometryThread::OdometryThread(const std::string& lport, const std::string& rpor
 	pthread_mutex_init(&this->mtx, NULL);
 	this->startThread();
 }
+
 OdometryThread::~OdometryThread()
 {
 	this->shutdownThread();
@@ -89,19 +90,31 @@ void* OdometryThread::runThread(void* data)
 
 	double DistancePerCount = odoth->DistancePerCount;
 	double axle = odoth->axle;
-	double theta = odoth->theta;
+	double theta = 0.0f;
 
 	std::chrono::high_resolution_clock::time_point ctime;
 	std::chrono::high_resolution_clock::time_point ptime;
-	std::chrono::milliseconds elapsed;
+	//std::chrono::milliseconds elapsed;
+	long int	elapsed_ms;
+	double		deltaT;
 
 	ptime = std::chrono::high_resolution_clock::now();
+
+	odoth->resetOdometry();
 	
 	while (1) {
 		// Get current elapsed time
 		ctime	= std::chrono::high_resolution_clock::now();
-		elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(ctime-ptime);
+		elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(ctime-ptime).count();
+		deltaT = (double)elapsed_ms / 1000.0f;
 		ptime   = ctime;
+
+		if(deltaT == 0.0f) {
+			usleep(20000);
+			continue;
+		}
+
+		//printf("elapsed: %f [s]\n", elapsed.count() / 1000.0f);
 
 		pthread_mutex_lock(&odoth->mtx);
 		bquit = !odoth->run;
@@ -113,34 +126,54 @@ void* OdometryThread::runThread(void* data)
 		// Get current encoders readings
 		deltaLeft  = odoth->enc_left->getDelta();
 		deltaRight = odoth->enc_right->getDelta();
-		
+
+		if ((deltaLeft == 0.0f) && (deltaRight == 0.0f)) {
+			usleep(20000);
+			continue;
+		}
+
+		//printf("deltaLeft=%f, deltaRight=%f\n", deltaLeft, deltaRight);
 		if (odoth->invert) 
 			deltaLeft *= -1;
 		
+		
 		// Get wheel velocities - DeltaCount*DistancePerCount/Time
-		velLeft  = (deltaLeft*DistancePerCount)  / (double)elapsed.count() / 1000.0f;
-		velRight = (deltaRight*DistancePerCount) / (double)elapsed.count() / 1000.0f;
+		velLeft  = (deltaLeft*DistancePerCount)  / deltaT;
+		velRight = (deltaRight*DistancePerCount) / deltaT;
+		//printf("velLeft=%f, velRight=%f\n", velLeft, velRight);
 
 		// Transform wheel velocity in world coordinates
 		velx  = ((velRight + velLeft) / 2.0f);
 		vely  = 0.0f;
 		velth = (velRight - velLeft) / axle;
+		
+		//printf("velx=%f, vely=%f, velth=%f\n", velx, vely, velth);
 
 		// Get current theta
 		pthread_mutex_lock(&odoth->mtx);
 		theta = odoth->theta;
 		pthread_mutex_unlock(&odoth->mtx);
+		
+		//printf("deltaLeft=%f, deltaRight=%f, deltaT=%f\n", deltaLeft, deltaRight, deltaT);
+		//printf("velLeft=%f, velRight=%f, velx=%f\n", velLeft, velRight, velx);
+		//printf("theta=%f, cos(theta)=%f, sin(theta)=%f\n", theta, cos(theta), sin(theta));
 
 		// Transform wheel counts in delta distances
-		deltax  = (velx * cos(theta)) * (double)elapsed.count() / 1000.0f;
-		deltay  = (velx * sin(theta)) * (double)elapsed.count() / 1000.0f;
-		deltath = velth * (double)elapsed.count() / 1000.0f;
+		//deltax  = (velx * cos(theta)) * ((double)elapsed.count() / 1000.0f);
+		//deltay  = (velx * sin(theta)) * ((double)elapsed.count() / 1000.0f);
+		//deltath = velth * ((double)elapsed.count() / 1000.0f);
+		deltax  = (velx * cos(theta)) * deltaT;
+		deltay  = (velx * sin(theta)) * deltaT;
+		deltath = velth * deltaT;
+		
+		//printf("deltax=%f, deltay=%f, deltath=%f\n", deltax, deltay, deltath);
 
 		// Update x, y, theta
 		pthread_mutex_lock(&odoth->mtx);
-		odoth->x += deltax;
-		odoth->y -= deltay;
-		odoth->theta += deltath;
+		odoth->x = odoth->x + deltax;
+		odoth->y = odoth->y - deltay;
+		odoth->theta = odoth->theta + deltath;
+		//printf("x=%f, y=%f, theta=%f\n", odoth->x, odoth->y, odoth->theta);
 		pthread_mutex_unlock(&odoth->mtx);
 
 		usleep(20000);
