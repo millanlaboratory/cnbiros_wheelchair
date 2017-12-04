@@ -1,0 +1,33 @@
+costmap:
+    global_frame: map
+    robot_base_frame: base_link
+    update_frequency: 10.0
+    publish_frequency: 5.0
+    static_map: false
+    rolling_window: true
+    always_send_full_costmap: true
+    width: 6.0
+    height: 6.0
+    resolution: 0.05
+    footprint: [ [0.5, 0.5], [-0.5, 0.5], [-0.5, -0.5], [0.5, -0.5] ]
+    plugins:
+        - {name: obstacles, type: "costmap_2d::VoxelLayer"}
+        - {name: sonars, type: "range_sensor_layer::RangeSensorLayer"}
+        - {name: inflation, type: "costmap_2d::InflationLayer"}
+    obstacles:
+        observation_sources: kinect_scan
+        track_unknown_space: true
+        kinect_scan: 
+            data_type: LaserScan
+            sensor_frame: /camera_link
+            clearing: true 
+            marking: true 
+            topic: /camera/scan
+            inf_is_valid: true
+    sonars:
+        clear_threshold:    0.46
+        mark_threshold:     0.98
+        no_readings_timeout: 0.0
+        topics: ["sonars/0xe0", "sonars/0xe2", "sonars/0xe4", "sonars/0xe6", "sonars/0xe8", "sonars/0xea", "sonars/0xec", "sonars/0xee", "sonars/0xf0", "sonars/0xf2"]
+
+      
