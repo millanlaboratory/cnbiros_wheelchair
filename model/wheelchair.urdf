@@ -232,7 +232,7 @@
 	<joint name="sonar_0xe0_joint" type="fixed">
 		<parent link="base_link"/>
 		<child link="sonar_0xe0_link"/>
-		<origin xyz="0.565 -0.10 -0.05"/>
+		<origin xyz="0.365 -0.10 -0.05"/>
     </joint>
 
 	<!-- Sonar 0xe2 - Link -->
@@ -312,7 +312,7 @@
 	<joint name="sonar_0xea_joint" type="fixed">
 		<parent link="base_link"/>
 		<child link="sonar_0xea_link"/>
-		<origin xyz="0.565 0.10 -0.05"/>
+		<origin xyz="0.365 0.10 -0.05"/>
     </joint>
 
 	<!-- Sonar 0xec - Link -->
