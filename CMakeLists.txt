@@ -13,6 +13,9 @@ add_service_files(
   Forward.srv
   SetVelocity.srv
   GetVelocity.srv
+  SetMaxRange.srv
+  SetMinRange.srv
+  SetFieldOfView.srv
 )
 
 generate_messages(

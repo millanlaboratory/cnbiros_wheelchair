@@ -23,11 +23,20 @@ UltraSonics::UltraSonics(ros::NodeHandle* node, unsigned int nsonars, std::strin
 
 	// Initialize message
 	this->msonar_.radiation_type = 0;
-	this->msonar_.field_of_view = 0.52; // +/- 30 degrees
-	this->msonar_.min_range = 0.06f;
-	this->msonar_.max_range = 6.00f;
-	
+	this->msonar_.field_of_view = CNBIROS_WHEELCHAIR_ULTRASONICS_FIELDOFVIEW; // 30 degrees
+	this->msonar_.min_range = CNBIROS_WHEELCHAIR_ULTRASONICS_MINRANGE; 
+	this->msonar_.max_range = CNBIROS_WHEELCHAIR_ULTRASONICS_MAXRANGE;
 
+	// Add services
+	this->rossrv_setmaxrange_ = node->advertiseService(
+								ros::this_node::getName() + "/maxrange", 
+								&UltraSonics::on_srv_setmaxrange_, this);
+	this->rossrv_setminrange_ = node->advertiseService(
+								ros::this_node::getName() + "/minrange", 
+								&UltraSonics::on_srv_setminrange_, this);
+	this->rossrv_setfieldofview_ =	node->advertiseService(
+									ros::this_node::getName() + "/fieldofview", 
+									&UltraSonics::on_srv_setfieldofview_, this);
 	// Initialize publishers
 	this->setup_publishers(node, name);
 
@@ -50,10 +59,21 @@ UltraSonics::UltraSonics(ros::NodeHandle* node, const std::vector<unsigned char>
 
 	// Initialize message
 	this->msonar_.radiation_type = 0;
-	this->msonar_.field_of_view = 0.52; // +/- 30 degrees
-	this->msonar_.min_range = 0.06f;
-	this->msonar_.max_range = 6.00f;
+	this->msonar_.field_of_view = CNBIROS_WHEELCHAIR_ULTRASONICS_FIELDOFVIEW; // 30 degrees
+	this->msonar_.min_range = CNBIROS_WHEELCHAIR_ULTRASONICS_MINRANGE; 
+	this->msonar_.max_range = CNBIROS_WHEELCHAIR_ULTRASONICS_MAXRANGE;
 	
+	// Add services
+	this->rossrv_setmaxrange_ = node->advertiseService(
+								ros::this_node::getName() + "/maxrange", 
+								&UltraSonics::on_srv_setmaxrange_, this);
+	this->rossrv_setminrange_ = node->advertiseService(
+								ros::this_node::getName() + "/minrange", 
+								&UltraSonics::on_srv_setminrange_, this);
+	this->rossrv_setfieldofview_ =	node->advertiseService(
+									ros::this_node::getName() + "/fieldofview", 
+									&UltraSonics::on_srv_setfieldofview_, this);
+
 	// Initialize publishers
 	this->setup_publishers(node, name);
 
@@ -62,6 +82,60 @@ UltraSonics::UltraSonics(ros::NodeHandle* node, const std::vector<unsigned char>
 UltraSonics::~UltraSonics(void) {
 	if(this->sonars_ != nullptr)
 		delete this->sonars_;
+}
+
+int UltraSonics::SetFieldOfView(float field) {
+	this->viewfield_ = field;
+	this->msonar_.field_of_view = this->viewfield_;
+	return 0;
+}
+
+int UltraSonics::SetMaxRange(float maxrange) {
+	this->maxrange_ = maxrange;
+	this->msonar_.max_range = this->maxrange_;
+	return 0;
+}
+
+int UltraSonics::SetMinRange(float minrange) {
+	this->minrange_ = minrange;
+	this->msonar_.min_range = this->minrange_;
+	return 0;
+}
+
+bool UltraSonics::on_srv_setmaxrange_(cnbiros_wheelchair::SetMaxRange::Request& req,
+						  cnbiros_wheelchair::SetMaxRange::Response& res) {
+	bool retcod = false;	
+
+	if(this->SetMaxRange(req.value) == 0) 
+		retcod = true;
+
+	res.result = retcod;
+
+	return retcod;
+}
+
+bool UltraSonics::on_srv_setminrange_(cnbiros_wheelchair::SetMinRange::Request& req,
+						  cnbiros_wheelchair::SetMinRange::Response& res) {
+	bool retcod = false;	
+
+	if(this->SetMinRange(req.value) == 0) 
+		retcod = true;
+
+	res.result = retcod;
+
+	return retcod;
+}
+
+bool UltraSonics::on_srv_setfieldofview_(cnbiros_wheelchair::SetFieldOfView::Request& req,
+						  cnbiros_wheelchair::SetFieldOfView::Response& res) {
+	bool retcod = false;	
+
+	if(this->SetFieldOfView(req.value) == 0) 
+		retcod = true;
+
+	res.result = retcod;
+
+	return retcod;
 }
 
 int UltraSonics::Open(const std::string& port) {
