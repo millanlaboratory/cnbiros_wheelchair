@@ -1,0 +1,4 @@
+<launch>
+	<!-- Rviz visualization -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find cnbiros_wheelchair)/rviz/ros_wheelchair_costmap.rviz" />
+</launch>
