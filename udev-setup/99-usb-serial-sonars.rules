@@ -1,0 +1,2 @@
+SUBSYSTEM=="tty", ATTRS{idVendor}=="04d8", ATTRS{idProduct}=="ffee", ATTRS{serial}=="00001666", SYMLINK+="sonars.right"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="04d8", ATTRS{idProduct}=="ffee", ATTRS{serial}=="00000661", SYMLINK+="sonars.left"

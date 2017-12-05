@@ -1,6 +1,6 @@
 # Ultrasonic sensors parameters
 
-port: /dev/ttyACM1
+port: /dev/sonars.left #/dev/ttyACM1
 addresses:
     - 0xea
     - 0xec

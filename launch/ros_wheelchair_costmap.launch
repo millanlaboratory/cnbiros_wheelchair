@@ -12,7 +12,7 @@
 	<!-- *********** Motors ***************** -->	
 	<!--
 	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_motors.launch">
-		<arg name="port" value="/dev/ttyUSB1" />
+		<arg name="port" value="/dev/controller" />
 	</include>
 	-->
 	
@@ -24,8 +24,8 @@
 	<!-- *********** Odometry ***************** -->	
 	<!--
 	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_odometry.launch">
-		<arg name="lport" value="/dev/ttyUSB0" />
-		<arg name="rport" value="/dev/ttyUSB1" />
+		<arg name="lport" value="/dev/encoder.left" />
+		<arg name="rport" value="/dev/encoder.right" />
 		<arg name="revolution" value="280" />
 	</include>
 	-->

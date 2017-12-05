@@ -1,6 +1,6 @@
 <launch>
-	<arg name="lport" default="/dev/ttyUSB0" />
-	<arg name="rport" default="/dev/ttyUSB2" />
+	<arg name="lport" default="/dev/encoder.left" />
+	<arg name="rport" default="/dev/encoder.right" />
 	<arg name="axle" default="0.5240" />
 	<arg name="diameter" default="0.3556" />
 	<arg name="revolution" default="280" />
