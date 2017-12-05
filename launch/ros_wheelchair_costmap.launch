@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<launch>
+
+	<!-- *********** UltraSonic sensors ***************** -->	
+	<node name="SonarRight" pkg="cnbiros_wheelchair" type="ros_wheelchair_ultrasonics" output="screen">
+		<rosparam command="load" file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_ultrasonics_right.yaml"/>
+	</node>	
+	<node name="SonarLeft" pkg="cnbiros_wheelchair" type="ros_wheelchair_ultrasonics" output="screen">
+		<rosparam command="load" file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_ultrasonics_left.yaml"/>
+	</node>	
+
+	<!-- *********** Motors ***************** -->	
+	<!--
+	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_motors.launch">
+		<arg name="port" value="/dev/ttyUSB1" />
+	</include>
+	-->
+	
+	<!-- *********** Kinect ***************** -->		
+	<include file="$(find cnbiros_wheelchair)/launch/ros_kinect_to_laserscan.launch">
+		<remap from="camera_link" to="kinect_link" />
+	</include>
+
+	<!-- *********** Odometry ***************** -->	
+	<!--
+	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_odometry.launch">
+		<arg name="lport" value="/dev/ttyUSB0" />
+		<arg name="rport" value="/dev/ttyUSB1" />
+		<arg name="revolution" value="280" />
+	</include>
+	-->
+
+	<!-- *********** Costmap ***************** -->	
+	<include file="$(find cnbiros_wheelchair)/launch/costmap_2d.launch" />
+
+	<!-- *********** Transformation ***************** -->	
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
+	<node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
+	<param name="robot_description" textfile="$(find cnbiros_wheelchair)/model/wheelchair.urdf" />
+
+	<!-- *********** Visualization ***************** -->	
+	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_costmap_rviz.launch" />
+</launch>
