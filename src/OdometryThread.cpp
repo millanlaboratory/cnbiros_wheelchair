@@ -142,7 +142,7 @@ void* OdometryThread::runThread(void* data)
 		pthread_mutex_lock(&odoth->mtx);
 		odoth->x		= odoth->x + deltax;
 		odoth->y		= odoth->y - deltay;
-		odoth->theta	= odoth->theta + deltath;
+		odoth->theta	= odoth->theta - deltath;
 		odoth->vx		= velx;
 		odoth->vy		= vely;
 		odoth->vtheta	= velth;

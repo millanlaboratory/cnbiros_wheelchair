@@ -110,7 +110,7 @@ void Odometry::onRunning(void) {
 
 		// Get current time and create quaternion
 		ctime = ros::Time::now();
-		oquat = tf::createQuaternionMsgFromYaw(theta);	
+		oquat = tf::createQuaternionMsgFromYaw(-theta);	
 
 		// Transformation
 		this->mtransform_.header.stamp = ctime;

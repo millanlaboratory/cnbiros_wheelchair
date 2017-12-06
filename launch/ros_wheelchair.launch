@@ -9,11 +9,9 @@
 	</node>	
 
 	<!-- *********** Motors ***************** -->	
-	<!--
 	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_motors.launch">
 		<arg name="port" value="/dev/controller" />
 	</include>
-	-->
 	
 	<!-- *********** Kinect ***************** -->	
 	<!--	
@@ -23,13 +21,11 @@
 	-->
 
 	<!-- *********** Odometry ***************** -->	
-	<!--
 	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_odometry.launch">
 		<arg name="lport" value="/dev/encoder.left" />
 		<arg name="rport" value="/dev/encoder.right" />
 		<arg name="revolution" value="280" />
 	</include>
-	-->
 
 	<!-- *********** Transformation ***************** -->	
 	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
