@@ -47,6 +47,7 @@ int Motors::Open(const std::string& port) {
 		this->dxgpsb_ = new DxgpsbThread(this->port_);
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(e.what());
+		return -1;
 	}
 
 	this->Stop();

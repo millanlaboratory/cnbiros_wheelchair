@@ -22,13 +22,18 @@ int main( int argc, char *argv[] )
 		return EINVAL;
 	}
 
-
-	cnbiros::wheelchair::OdometryThread odometry(argv[1], argv[2], 
+	cnbiros::wheelchair::OdometryThread* odometry;
+	try {
+		odometry = new cnbiros::wheelchair::OdometryThread(argv[1], argv[2], 
 						WHEEL_AXLE, WHEEL_DIAMETER, WHEEL_REVOLUTION_COUNTS);
+	} catch (std::runtime_error& e) {
+		fprintf(stderr, "%s\n", e.what());
+		exit(EXIT_FAILURE);
+	}
 	
 	for (;;){
 		
-		odometry.getOdometry(&x, &y, &theta, &vx, &vy, &vtheta);
+		odometry->getOdometry(&x, &y, &theta, &vx, &vy, &vtheta);
 		printf("Position (x,   y,  theta)=> (%3.2f, %3.2f, %3.2f) [m, m, deg]\n", 
 				x, y, theta*180.0f / M_PI);
 		printf("Velocity (vx, vy, vtheta)=> (%3.2f, %3.2f, %3.2f) [m/s, m/s, deg/s]\n", 
@@ -36,7 +41,8 @@ int main( int argc, char *argv[] )
 			
 		usleep(100000);
 	}
-	
+
+	delete odometry;
 	return 0;
 }
 

@@ -148,6 +148,7 @@ int UltraSonics::Open(const std::string& port) {
 		this->sonars_ = new SonarThread(this->port_.c_str(), this->nsonars_, this->addresses_.data());
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(e.what());
+		return -1;
 	}
 
 	for(auto it=this->addresses_.begin(); it!=this->addresses_.end(); ++it) {

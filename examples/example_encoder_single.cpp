@@ -18,18 +18,25 @@ int main( int argc, char *argv[] )
 		return EINVAL;
 	}
 
+	cnbiros::wheelchair::EncoderThread* encoder;
 
-	cnbiros::wheelchair::EncoderThread encoder(argv[1]);
+	try {
+		encoder = new cnbiros::wheelchair::EncoderThread(argv[1]);
+	} catch (std::runtime_error& e) {
+		fprintf(stderr, "%s\n", e.what());
+		exit(EXIT_FAILURE);
+	}
 	
 	for (;;){
-		counts = encoder.getDelta(sequence);
+		counts = encoder->getDelta(sequence);
 		printf("Counts on %s: % 3.0f - Sequence %d\n", argv[1], counts, sequence);
 			
 		//printf("%4f\n", enc_thread1.getDelta());
 			
 		usleep(100000);
 	}
-	
+
+	delete encoder;
 	return 0;
 }
 

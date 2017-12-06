@@ -49,8 +49,7 @@ Sonar::Sonar(const char* port, int n_sonar,
 	
 }
 
-Sonar::~Sonar()
-{
+Sonar::~Sonar() {
 	this->closePort();
 }
 

@@ -11,8 +11,16 @@ OdometryThread::OdometryThread(const std::string& lport, const std::string& rpor
 							   double axle, double diameter, int revolution, 
 							   bool invert_left_wheel) 
 {
-	this->enc_left = new EncoderThread(lport);
-	this->enc_right = new EncoderThread(rport);
+	try {
+		this->enc_left = new EncoderThread(lport);
+	} catch (std::runtime_error& e) {
+		throw std::runtime_error(e.what());
+	}
+	try {
+		this->enc_right = new EncoderThread(rport);
+	} catch (std::runtime_error& e) {
+		throw std::runtime_error(e.what());
+	}
 		
 	this->x = 0.0f;
 	this->y = 0.0f;
@@ -34,6 +42,8 @@ OdometryThread::~OdometryThread(void)
 {
 	this->shutdownThread();
 	pthread_mutex_destroy(&this->mtx);
+	delete this->enc_left;
+	delete this->enc_right;
 }
 
 void OdometryThread::startThread(void)
@@ -48,7 +58,7 @@ void OdometryThread::startThread(void)
 
 void OdometryThread::shutdownThread(void)
 {
-	std::cout << "Killing OdometryThread" << std::endl;
+	printf("Killing OdometryThread\n");
 
 	// Notify the thread to stop			
 	pthread_mutex_lock(&this->mtx);

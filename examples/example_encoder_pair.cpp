@@ -17,20 +17,35 @@ int main( int argc, char *argv[] )
 		return EINVAL;
 	}
 
+	cnbiros::wheelchair::EncoderThread* encright;
+	cnbiros::wheelchair::EncoderThread* encleft;
 
-	cnbiros::wheelchair::EncoderThread encright(argv[1]);
-	cnbiros::wheelchair::EncoderThread encleft(argv[2]);
+	try {
+		encright = new cnbiros::wheelchair::EncoderThread(argv[1]);
+	} catch (std::runtime_error& e) {
+		fprintf(stderr, "%s\n", e.what());
+		exit(EXIT_FAILURE);
+	}
+
+	try {
+		encleft = new cnbiros::wheelchair::EncoderThread(argv[2]);
+	} catch (std::runtime_error& e) {
+		fprintf(stderr, "%s\n", e.what());
+		exit(EXIT_FAILURE);
+	}
 	
 	for (;;){
- 		dl = encleft.getDelta();
- 		dr = encright.getDelta();
+ 		dl = encleft->getDelta();
+ 		dr = encright->getDelta();
 		printf("Delta (left, right) ( % 3.0f, % 3.0f )\n", dl, dr);
 			
 		//printf("%4f\n", enc_thread1.getDelta());
 			
 		usleep(100000);
 	}
-	
+
+	delete encright;
+	delete encleft;
 	return 0;
 }
 

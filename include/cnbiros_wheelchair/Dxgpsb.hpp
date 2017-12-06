@@ -15,15 +15,6 @@
 #include <sys/time.h>
 #include <string>
 
-
-#ifndef DEG2RAD
-#define DEG2RAD (M_PI/180.0)
-#endif
-
-#ifndef RAD2DEG
-#define RAD2DEG (180.0/M_PI)
-#endif
-
 namespace cnbiros {
 	namespace wheelchair {
 
@@ -40,6 +31,7 @@ class Dxgpsb {
 		int readVelocities();
 		int update();
 		void main();
+		int closePort(void);
 	
 	private:
 		int setupPort(const char* port);

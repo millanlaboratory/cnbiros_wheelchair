@@ -37,8 +37,15 @@ Encoder::~Encoder() {
 }
 
 void Encoder::ClosePort() {
-	if (this->fd != -1)
+	
+	if (this->fd != -1) {
+		try {
+			this->flushEncoder();
+		} catch (std::runtime_error& e) {
+			throw std::runtime_error(e.what());
+		}
 		close(this->fd);
+	}
 }
 
 int Encoder::setupPort(const char* port)
@@ -49,20 +56,23 @@ int Encoder::setupPort(const char* port)
 	this->fd = open( port, O_RDWR | O_NOCTTY | O_SYNC );
 	
 	if ( this->fd == -1 ) {
+		this->ClosePort();
 		myerrno = errno;
-		//printf( "open() of %s failed: %s\n", port, strerror( myerrno ) );
+		throw std::runtime_error("Cannot open encoder at " + std::string(port) + ": " +  strerror(myerrno));
 		return myerrno;
 	}
 
 	if ( ioctl( this->fd , TCGETA, & termInfo ) == -1 ) {
+		this->ClosePort();
 		myerrno = errno;
-		//printf( "ioctl(TCGETA) failed: %s\n", strerror( myerrno ) );
+		throw std::runtime_error("ioctl(TCGETA) failed: " + std::string(strerror(myerrno)));
 		return myerrno;
 	}
 
 	if( tcgetattr( this->fd, & termInfo ) == -1 ) {
+		this->ClosePort();
 		myerrno = errno;
-		//printf( "tcgetattr() failed: %s\n", strerror( myerrno ) );
+		throw std::runtime_error("tcgetattr() failed: " + std::string(strerror(myerrno)));
 		return myerrno;
 	}
 
@@ -78,26 +88,43 @@ int Encoder::setupPort(const char* port)
 	tcflush( this->fd, TCIFLUSH );
 
 	if ( tcsetattr( this->fd, TCSANOW, &termInfo) == -1 ) {
+		this->ClosePort();
 		myerrno = errno;
-		//printf( "tcsetattr() failed: %s\n", strerror( myerrno ) );
+		throw std::runtime_error("tcsetattr() failed: " + std::string(strerror(myerrno)));
 		return myerrno;
 	}	
 
 	return 0;
 }
-/* Perform basic checks and flush the communications buffer */
 
+/* Perform basic checks and flush the communications buffer */
 int Encoder::setupEncoder()
 {
-	this->flushEncoder();
-	
-	this->testEncoder();
-	
-	if(this->verbose){
-		this->getEncoderVersion();
+	try {
+		this->flushEncoder();
+	} catch (std::runtime_error& e) {
+		throw std::runtime_error(e.what());
 	}
 
-	this->flushEncoder();
+	try {
+		this->testEncoder();
+	} catch (std::runtime_error& e) {
+		throw std::runtime_error(e.what());
+	}
+	
+	if(this->verbose){
+		try {
+			this->getEncoderVersion();
+		} catch (std::runtime_error& e) {
+			throw std::runtime_error(e.what());
+		}
+	}
+
+	try {
+		this->flushEncoder();
+	} catch (std::runtime_error& e) {
+		throw std::runtime_error(e.what());
+	}
 	
 	return 0;
 }
@@ -120,7 +147,7 @@ int Encoder::toggleVelocityOutput()
 	
 	if ( nwritten != 2 ) {
 		if(this->verbose){
-			printf( "Failed to toggle velocity output on wheel encoders\n");
+			throw std::runtime_error("Failed to toggle velocity output on wheel encoders");
 		}
 		return -1;
 	} else {
@@ -150,7 +177,7 @@ int Encoder::toggleDistanceOutput()
 	
 	if ( nwritten != 2 ) {
 		if(this->verbose){
-			printf( "Failed to toggle distance output on wheel encoders\n");
+			throw std::runtime_error("Failed to toggle distance output on wheel encoders");
 		}
 		return -1;
 	} else {
@@ -187,7 +214,7 @@ int Encoder::flushEncoder()
 	printf("Attempting to flush encoder buffer %d\n", fd);
 				
 	if ( nwritten != N_send ) {
-		printf( "Failed to flush endoer\n");
+		throw std::runtime_error("Failed to flush encoder");
 		return -1;
 	} 
 	
@@ -196,11 +223,11 @@ int Encoder::flushEncoder()
 		nread = read( this->fd, &c, 1);
 		if ( nread == -1 ) {
 			myerrno = errno;
-			printf( "FLUSH: read() failed: %s\n", strerror( myerrno ) );
+			throw std::runtime_error("FLUSH: read() failed: " + std::string(strerror(myerrno)));
 			return myerrno;
 		}
 		if ( nread == 0 ) {
-			printf( "read() failed, unexpected EOF\n" );
+			throw std::runtime_error("FLUSH: read() failed, unexpected EOF");
 			return ENODATA;
 		}
 
@@ -237,7 +264,7 @@ int Encoder::getEncoderVersion()
 	tcflush( this->fd, TCIFLUSH );		
 	
 	if ( nwritten != N_send ) {
-		printf( "Failed to request encoder version\n");
+		throw std::runtime_error("Failed to request encoder version");
 		return -1;
 	} 
 	
@@ -246,11 +273,11 @@ int Encoder::getEncoderVersion()
 		nread = read( fd, rbuf + totalread, ndata - totalread );
 		if ( nread == -1 ) {
 			myerrno = errno;
-			printf( "read() failed: %s\n", strerror( myerrno ) );
+			throw std::runtime_error("read() failed: " + std::string(strerror(myerrno)));
 			return myerrno;
 		}
 		if ( nread == 0 ) {
-			printf( "read() failed, unexpected EOF\n" );
+			throw std::runtime_error("read() failed, unexpected EOF");
 			return ENODATA;
 		}
 		totalread += nread;
@@ -282,7 +309,7 @@ int Encoder::testEncoder()
 	tcflush( this->fd, TCIFLUSH );		
 	
 	if ( nwritten != N_send ) {
-		printf( "Failed to send test message\n");
+		throw std::runtime_error("Failed to send test message");
 		return -1;
 	} 
 	
@@ -291,11 +318,11 @@ int Encoder::testEncoder()
 		nread = read( fd, rbuf + totalread, ndata - totalread );
 		if ( nread == -1 ) {
 			myerrno = errno;
-			printf( "read() failed: %s\n", strerror( myerrno ) );
+			throw std::runtime_error("read() failed: " + std::string(strerror(myerrno)));
 			return myerrno;
 		}
 		if ( nread == 0 ) {
-			printf( "read() failed, unexpected EOF\n" );
+			throw std::runtime_error("read() failed, unexpected EOF");
 			return ENODATA;
 		}
 		totalread += nread;
@@ -305,7 +332,7 @@ int Encoder::testEncoder()
 	if (!((rbuf[0] == sbuf[0]) && (rbuf[1] == sbuf[2]) && (rbuf[2] == sbuf[1]))){
 		// If the test succeeds, nibbles 1 and 2 should swap positions
 		// e.g. if you send E5A, you should receive EA5.
-		printf("Encoder self-test failed, received %d characters : %s\n", totalread, rbuf);
+		throw std::runtime_error("Encoder self-test failed");
 		return -1;
 	}
 	
@@ -334,11 +361,11 @@ int Encoder::readEncoder()
 		nread = read( this->fd, rbuf + totalread, 1 );
 		if ( nread == -1 ) {
 			myerrno = errno;
-			printf( "read() failed: %s\n", strerror( myerrno ) );
+			throw std::runtime_error("read() failed: " + std::string(strerror(myerrno)));
 			return myerrno;
 		}
 		if ( nread == 0 ) {
-			printf( "read() failed, unexpected EOF\n" );
+			throw std::runtime_error("read() failed, unexpected EOF");
 			return ENODATA;
 		}
 

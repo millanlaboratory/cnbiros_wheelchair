@@ -23,7 +23,10 @@ DxgpsbThread::DxgpsbThread(const std::string& port) {
 }
 
 DxgpsbThread::~DxgpsbThread(void) {
+	this->shutdownThread();
 	pthread_mutex_destroy(&this->mtx);
+	this->dxgpsb->closePort();
+	delete this->dxgpsb;
 }
 
 void DxgpsbThread::startThread() {
@@ -36,7 +39,7 @@ void DxgpsbThread::startThread() {
 }
 
 void DxgpsbThread::shutdownThread() {
-	std::cout << "Killing DxgpsbThread" << std::endl;
+	printf("Killing DxgpsbThread\n");
 
 	// notify the thread to stop
 	pthread_mutex_lock(&this->mtx);

@@ -16,9 +16,19 @@ int main(int argc, char *argv[])
 	cnbiros::wheelchair::Sonar *sr;
 
 	if ( argc == 2 ) {
-		sr = new cnbiros::wheelchair::Sonar(argv[1]);
+		try {
+			sr = new cnbiros::wheelchair::Sonar(argv[1]);
+		} catch (std::runtime_error& e) {
+			fprintf(stderr, "%s\n", e.what());
+			exit(EXIT_FAILURE);
+		}
 	} else {
-		sr = new cnbiros::wheelchair::Sonar();
+		try {
+			sr = new cnbiros::wheelchair::Sonar();
+		} catch (std::runtime_error& e) {
+			fprintf(stderr, "%s\n", e.what());
+			exit(EXIT_FAILURE);
+		}
 	}
 	
 	
@@ -60,7 +70,7 @@ int main(int argc, char *argv[])
 		std::cout << "ERROR: could not change address of SRF02 to 0x" << s << std::endl;
 	}
 
-	
+	delete sr;	
 	return 0;
 	
 }

@@ -47,9 +47,11 @@ int main(int argc, char* argv[]) {
   		} else {
   		  dxgpsbt = new cnbiros::wheelchair::DxgpsbThread();
   		}
-	} catch (std::logic_error& e) {
-		std::cout<<"error code: "<<e.what()<<std::endl;
+	} catch (std::runtime_error& e) {
+		fprintf(stderr, "%s\n", e.what());
+		exit(EXIT_FAILURE);
 	}
+
 
   	bool runloop = true;
   	  

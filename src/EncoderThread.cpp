@@ -8,21 +8,26 @@ namespace cnbiros {
 
 EncoderThread::EncoderThread(const std::string& port)
 {
-	this->enc = new Encoder(port);
+	try {
+		this->enc = new Encoder(port);
+	} catch (std::runtime_error& e) {
+		throw std::runtime_error(e.what());
+	}
 
-	pthread_mutex_init(&this->mtx, NULL);
 	this->delta = 0;
 	this->counter = 0;
 	this->seq = 0;
 		
-	
+	pthread_mutex_init(&this->mtx, NULL);
 	this->startThread();
 }
 
 EncoderThread::~EncoderThread()
 {
+	this->shutdownThread();
 	pthread_mutex_destroy(&this->mtx);
-	
+	this->enc->ClosePort();
+	delete this->enc;
 }
 
 void EncoderThread::startThread()
@@ -35,16 +40,18 @@ void EncoderThread::startThread()
 	printf("Started EncoderThread\n");
 	pthread_mutex_unlock(&this->mtx);
 
-
 }
 
 void EncoderThread::shutdownThread()
 {
-	printf("Killing EncoderThread");
+	printf("Killing EncoderThread\n");
+	
+	// notify the thread to stop
 	pthread_mutex_lock(&this->mtx);
 	this->run = false;
 	pthread_mutex_unlock(&this->mtx);
 
+	// Wait the thread to stop
 	pthread_join(this->encthread, NULL);
 }
 
@@ -57,7 +64,11 @@ void* EncoderThread::runThread(void* data)
 	
 	while (!bquit) {
 		// Read the wheel encoder
-		d = encth->enc->readEncoder();
+		try {
+			d = encth->enc->readEncoder();
+		} catch (std::runtime_error& e) {
+			throw std::runtime_error(e.what());
+		}
 	
 		//HACK to supress spurious readings
  		if ((d > 100) || (d < -100))

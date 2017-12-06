@@ -22,7 +22,19 @@ Dxgpsb::Dxgpsb(const std::string& port) {
 	}
 }
 
-Dxgpsb::~Dxgpsb(void){}
+Dxgpsb::~Dxgpsb(void){
+	this->closePort();
+}
+
+int Dxgpsb::closePort(void) {
+
+	if(this->fd != -1) {
+		tcflush( this->fd, TCIOFLUSH );
+		close(this->fd);
+	}
+
+	return 0;
+}
 
 bool Dxgpsb::seekByte(char b, int search_limit = 24) {
 	int myerrno, nread;
@@ -40,12 +52,12 @@ bool Dxgpsb::seekByte(char b, int search_limit = 24) {
   
 		if (nread == -1) {
 			myerrno = errno;
-			//printf( "read() failed: %s\n", strerror( myerrno ) );
+			throw std::runtime_error("read() failed:: " + std::string(strerror(myerrno)));
 			return myerrno;
 		}
     
 		if (nread == 0) {
-			//printf( "read() failed, unexpected EOF\n" );
+			throw std::runtime_error("read() failed, unexpected EOF");
 			return ENODATA;
 		}
     
@@ -125,7 +137,7 @@ int Dxgpsb::readDevice(unsigned char *return_data) {
   	 
   	// Check for start byte
   	if (!seekByte('@')){
-		printf( "Missing sample from Dxgpsb (start byte not found)\n" );
+		throw std::runtime_error("Missing sample from Dxgpsb (start byte not found)");
   	  	return -1;
   	}
 
@@ -169,26 +181,20 @@ int Dxgpsb::setupPort(const char* port) {
   	
 	if (this->fd == -1) {
 		myerrno = errno;
-  	  	throw std::runtime_error("Cannot open motors at " + std::string(port) + ": " + strerror(myerrno));
-		//printf( "open() of %s failed: %s\n", port, strerror( myerrno ) );
-  	  	//return myerrno;
-		//return -1;
+  	  	throw std::runtime_error("Cannot open motors at " + std::string(port) + ": " + std::string(strerror(myerrno)));
+  	  	return myerrno;
   	}
 
   	if ( ioctl( this->fd , TCGETA, & termInfo ) == -1 ) {
 		myerrno = errno;
   	  	throw std::runtime_error("ioctl(TCGETA) failed: " + std::string(strerror(myerrno)));
-  	  	//printf( "ioctl(TCGETA) failed: %s\n", strerror( myerrno ) );
-  	  	//return myerrno;
-		//return -1;
+  	  	return myerrno;
   	}
 
   	if( tcgetattr( this->fd, & termInfo ) == -1 ) {
 		myerrno = errno;
   	  	throw std::runtime_error("tcgetattr() failed: " + std::string(strerror(myerrno)));
-  	  	//printf( "tcgetattr() failed: %s\n", strerror( myerrno ) );
-  	  	//return myerrno;
-		//return -1;
+  	  	return myerrno;
   	}
 
   	cfsetspeed( & termInfo , B38400 );
@@ -207,9 +213,7 @@ int Dxgpsb::setupPort(const char* port) {
   	if ( tcsetattr( this->fd, TCSANOW, &termInfo) == -1 ) {
 		myerrno = errno;
   	  	throw std::runtime_error("tcsetattr() failed: " + std::string(strerror(myerrno)));
-  	  	//printf( "tcsetattr() failed: %s\n", strerror( myerrno ) );
-  	  	//return myerrno;
-		//return -1;
+  	  	return myerrno;
   	}	
   	
   	printf("Connected to a Dxgpsb on port: %s\n", port);

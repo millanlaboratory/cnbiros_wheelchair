@@ -50,6 +50,7 @@ int Odometry::Open(const std::string& lport, const std::string& rport) {
 	} catch (std::runtime_error& e) {
 		retcod = -1;
 		throw std::runtime_error(e.what());
+		return retcod;
 	}
 
 	ROS_INFO("USB ports %s and %s opened. Odometry set.\n", this->lport_.c_str(),
