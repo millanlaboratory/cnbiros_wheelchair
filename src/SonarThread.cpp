@@ -11,7 +11,11 @@ SonarThread::SonarThread(const char* port, int n_sonar, const unsigned char* add
  	//printf("SRT: CALLED %d\n", (int) address_book[0]);
 	
 	this->N_SONAR = n_sonar;
-	this->sr = new Sonar(port, n_sonar, address_book, max_gains);
+	try {
+		this->sr = new Sonar(port, n_sonar, address_book, max_gains);
+	} catch (std::runtime_error& e) {
+		throw std::runtime_error(e.what());
+	}
 
 	for (int i = 0; i < N_SONAR; i++){
 		this->readings[i] = 0;
@@ -24,7 +28,10 @@ SonarThread::SonarThread(const char* port, int n_sonar, const unsigned char* add
 
 SonarThread::~SonarThread()
 {
+	this->shutdownThread();
 	pthread_mutex_destroy(&this->mtx);
+	this->sr->closePort();
+	delete this->sr;
 }
 
 void SonarThread::startThread()
@@ -39,7 +46,7 @@ void SonarThread::startThread()
 
 void SonarThread::shutdownThread()
 {
-	std::cout << "Killing SonarThread" << std::endl;
+	printf("Killing SonarThread\n");
 
 	// notify the thread to stop
 	pthread_mutex_lock(&this->mtx);

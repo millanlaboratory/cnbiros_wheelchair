@@ -138,18 +138,21 @@ int Sonar::setupPort(const char* port)
 	
 	this->fd = open( port, O_RDWR | O_NOCTTY | O_SYNC );
 	if ( this->fd == -1 ) {
+		this->closePort();
 		myerrno = errno;
 		throw std::runtime_error("Cannot open sonars at " + std::string(port) + ": " +  strerror(myerrno));
 		return myerrno;
 	}
 
 	if ( ioctl( this->fd , TCGETA, & termInfo ) == -1 ) {
+		this->closePort();
 		myerrno = errno;
 		throw std::runtime_error("ioctl(TCGETA) failed: " + std::string(strerror(myerrno)));
 		return myerrno;
 	}
 
 	if( tcgetattr( this->fd, & termInfo ) == -1 ) {
+		this->closePort();
 		myerrno = errno;
 		throw std::runtime_error("tcgetattr() failed: " + std::string(strerror(myerrno)));
 		return myerrno;
@@ -168,6 +171,7 @@ int Sonar::setupPort(const char* port)
 	tcflush( this->fd, TCIFLUSH );
 	
 	if ( tcsetattr( this->fd, TCSANOW, &termInfo) == -1 ) {
+		this->closePort();
 		myerrno = errno;
 		throw std::runtime_error("tcsetattr() failed: " + std::string(strerror(myerrno)));
 		return myerrno;
@@ -355,8 +359,10 @@ int Sonar::changeAddress(unsigned char old_addr, unsigned char new_addr)
 
 int Sonar::closePort(void) {
 
-	if(this->fd != -1)
+	if(this->fd != -1) {
+		tcflush( this->fd, TCIFLUSH );
 		close(this->fd);
+	}
 
 	return 0;
 }

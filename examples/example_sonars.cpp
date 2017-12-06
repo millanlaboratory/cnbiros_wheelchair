@@ -2,15 +2,48 @@
 #include "cnbiros_wheelchair/SonarThread.hpp"
 
 #include <iostream>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
+
 
 void usage( char *x ) {
 	printf( "usage: %s /dev/ttyUSB0 5\n", x );
+}
+
+int kbhit(void)
+{
+  struct termios oldt, newt;
+  int ch;
+  int oldf;
+
+  tcgetattr(STDIN_FILENO, &oldt);
+  newt = oldt;
+  newt.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+  oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+  fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+  ch = getchar();
+
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+  fcntl(STDIN_FILENO, F_SETFL, oldf);
+
+  if(ch != EOF)
+  {
+    ungetc(ch, stdin);
+    return 1;
+  }
+
+  return 0;
 }
 
 int main( int argc, char *argv[] ) 
 {
 
 	int N_SONAR;
+	char input;
 	cnbiros::wheelchair::SonarThread *sr;
 	
 	if ( argc != 3 ) {
@@ -20,13 +53,18 @@ int main( int argc, char *argv[] )
 	}
 	N_SONAR = std::stoi(std::string(argv[2]));
 
-	sr = new cnbiros::wheelchair::SonarThread(argv[1], N_SONAR);
+	try {
+		sr = new cnbiros::wheelchair::SonarThread(argv[1], N_SONAR);
+	} catch (std::runtime_error& e) {
+		fprintf(stderr, "%s\n", e.what());
+		exit(EXIT_FAILURE);
+	}
 				
 	printf("Checking %d sensors on port %s\n", N_SONAR, argv[1]);
 
 	int range[N_SONAR];
-		
-	while ( 1 ) { 
+
+	while (!kbhit()) { 
 
 		sr->getReadings(range);
 
@@ -38,6 +76,9 @@ int main( int argc, char *argv[] )
 		usleep(100000);
 	}	
 
+	delete sr;
+	usleep(100000);
+	return 0;
 }
 
 
