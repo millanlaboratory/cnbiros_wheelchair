@@ -41,7 +41,12 @@ OdometryThread::OdometryThread(const std::string& lport, const std::string& rpor
 OdometryThread::~OdometryThread(void)
 {
 	printf("Killing OdometryThread\n");
-	
+
+	printf("Stopping encoder thread left\n");
+	this->enc_left->stopThread();
+	printf("Stopping encoder thread right\n");
+	this->enc_right->stopThread();
+
 	// Delete the two encoders (the related thread will stop and join)
 	delete this->enc_left;
 	delete this->enc_right;

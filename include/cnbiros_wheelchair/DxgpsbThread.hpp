@@ -19,6 +19,7 @@ class DxgpsbThread {
 		int getVelocities(float &v, float &w);
 		int getVelocities(char &v, char &w);
 
+		void stopThread();
 		void startThread();
 
 	protected:

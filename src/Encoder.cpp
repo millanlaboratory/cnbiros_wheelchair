@@ -40,6 +40,7 @@ int Encoder::ClosePort() {
 	
 	if (this->fd != -1) {
 		close(this->fd);
+		this->fd = -1;
 	}
 	return 0;
 }
@@ -354,6 +355,7 @@ int Encoder::readEncoder()
 	
 	for( totalread = 0, ndata = N_rbuf, nread = 0, tries = 0, maxtries = 20;
 						totalread < ndata && tries < maxtries; tries++ ) {
+
 		nread = read( this->fd, rbuf + totalread, 1 );
 		if ( nread == -1 ) {
 			myerrno = errno;

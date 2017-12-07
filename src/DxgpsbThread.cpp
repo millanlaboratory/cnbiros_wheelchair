@@ -10,7 +10,7 @@ namespace cnbiros {
 
 
 DxgpsbThread::DxgpsbThread(const std::string& port) {
- 	std::cout << "DxgpsbRT: CALLED" << std::endl;
+ 	std::cout << "Dxgpsb: CALLED" << std::endl;
 
 	try {
 		this->dxgpsb = new Dxgpsb(port);
@@ -25,17 +25,15 @@ DxgpsbThread::DxgpsbThread(const std::string& port) {
 DxgpsbThread::~DxgpsbThread(void) {
 	
 	printf("Killing DxgpsbThread\n");
+	this->stopThread();
 
-	// notify the thread to stop
-	pthread_mutex_lock(&this->mtx);
-	this->run = false;
-	pthread_mutex_unlock(&this->mtx);
+	// Remove the joining because there is a blocking function in the running
+	// thread	
+	// Wait the thread to stop
+	//pthread_join(this->dxthread, NULL);
 	
 	// close port and delete encoder object
 	delete this->dxgpsb;
-	
-	// Wait the thread to stop
-	pthread_join(this->dxthread, NULL);
 	
 	// Destroy the mutex
 	pthread_mutex_destroy(&this->mtx);
@@ -48,6 +46,21 @@ void DxgpsbThread::startThread() {
 
 	pthread_create(&this->dxthread, NULL, runThread, this);
 	pthread_mutex_unlock(&this->mtx);
+}
+
+void DxgpsbThread::stopThread() {
+
+	bool isrunning;
+
+	pthread_mutex_lock(&this->mtx);
+	isrunning = this->run;
+	pthread_mutex_unlock(&this->mtx);
+
+	if(isrunning == true) {
+		pthread_mutex_lock(&this->mtx);
+		this->run = false;
+		pthread_mutex_unlock(&this->mtx);
+	}
 }
 
 void* DxgpsbThread::runThread(void* data) {

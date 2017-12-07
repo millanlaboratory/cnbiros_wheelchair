@@ -24,6 +24,7 @@ int main (int argc, char** argv) {
 
 	motors.Run();
 
+	ros::shutdown();
 
 	return 0;
 }

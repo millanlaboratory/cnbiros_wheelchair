@@ -24,19 +24,36 @@ EncoderThread::EncoderThread(const std::string& port)
 
 EncoderThread::~EncoderThread()
 {
-	// Notify the thread to stop	
-	pthread_mutex_lock(&this->mtx);
-	this->run = false;
-	pthread_mutex_unlock(&this->mtx);
+	printf("Killing EncoderThread\n");
+	this->stopThread();
 
+	// Remove the joining because there is a blocking function in the running
+	// thread	
+	//// Wait the thread to join
+	//printf("Encoder Trying to join...\n");
+	//pthread_join(this->encthread, NULL);
+	//printf("Encoder Joined\n");
+	
 	// close port and delete encoder object
 	delete this->enc;
-	
-	// Wait the thread to join
-	pthread_join(this->encthread, NULL);
 
 	// Destroy the mutex
 	pthread_mutex_destroy(&this->mtx);
+}
+
+void EncoderThread::stopThread() {
+
+	bool isrunning;
+
+	pthread_mutex_lock(&this->mtx);
+	isrunning = this->run;
+	pthread_mutex_unlock(&this->mtx);
+
+	if(isrunning == true) {
+		pthread_mutex_lock(&this->mtx);
+		this->run = false;
+		pthread_mutex_unlock(&this->mtx);
+	}
 }
 
 void EncoderThread::startThread()
@@ -72,7 +89,7 @@ void* EncoderThread::runThread(void* data)
 		bquit = !encth->run;
 		pthread_mutex_unlock(&encth->mtx);
 	}
-
+	printf("stop\n");
 	return NULL;
 }
 
