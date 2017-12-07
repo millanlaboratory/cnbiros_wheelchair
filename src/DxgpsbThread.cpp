@@ -23,10 +23,22 @@ DxgpsbThread::DxgpsbThread(const std::string& port) {
 }
 
 DxgpsbThread::~DxgpsbThread(void) {
-	this->shutdownThread();
-	pthread_mutex_destroy(&this->mtx);
-	this->dxgpsb->closePort();
+	
+	printf("Killing DxgpsbThread\n");
+
+	// notify the thread to stop
+	pthread_mutex_lock(&this->mtx);
+	this->run = false;
+	pthread_mutex_unlock(&this->mtx);
+	
+	// close port and delete encoder object
 	delete this->dxgpsb;
+	
+	// Wait the thread to stop
+	pthread_join(this->dxthread, NULL);
+	
+	// Destroy the mutex
+	pthread_mutex_destroy(&this->mtx);
 }
 
 void DxgpsbThread::startThread() {
@@ -37,19 +49,6 @@ void DxgpsbThread::startThread() {
 	pthread_create(&this->dxthread, NULL, runThread, this);
 	pthread_mutex_unlock(&this->mtx);
 }
-
-void DxgpsbThread::shutdownThread() {
-	printf("Killing DxgpsbThread\n");
-
-	// notify the thread to stop
-	pthread_mutex_lock(&this->mtx);
-	this->run = false;
-	pthread_mutex_unlock(&this->mtx);
-
-	// Wait the thread to stop
-	pthread_join(this->dxthread, NULL);
-}
-
 
 void* DxgpsbThread::runThread(void* data) {
 	char v, w;

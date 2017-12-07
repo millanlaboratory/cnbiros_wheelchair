@@ -1,7 +1,38 @@
 #include "cnbiros_wheelchair/EncoderThread.hpp"
-
+#include <iostream>
+#include <stdio.h>
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
 void usage( char *x ) {
 	printf( "usage: %s /dev/ttyUSB0\n", x );
+}
+
+int kbhit(void)
+{
+  struct termios oldt, newt;
+  int ch;
+  int oldf;
+
+  tcgetattr(STDIN_FILENO, &oldt);
+  newt = oldt;
+  newt.c_lflag &= ~(ICANON | ECHO);
+  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+  oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+  fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+  ch = getchar();
+
+  tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+  fcntl(STDIN_FILENO, F_SETFL, oldf);
+
+  if(ch != EOF)
+  {
+    ungetc(ch, stdin);
+    return 1;
+  }
+
+  return 0;
 }
 
 int main( int argc, char *argv[] ) 
@@ -27,7 +58,7 @@ int main( int argc, char *argv[] )
 		exit(EXIT_FAILURE);
 	}
 	
-	for (;;){
+	while (!kbhit()) { 
 		counts = encoder->getDelta(sequence);
 		printf("Counts on %s: % 3.0f - Sequence %d\n", argv[1], counts, sequence);
 			

@@ -20,7 +20,6 @@ class DxgpsbThread {
 		int getVelocities(char &v, char &w);
 
 		void startThread();
-		void shutdownThread();
 
 	protected:
 		Dxgpsb* dxgpsb;

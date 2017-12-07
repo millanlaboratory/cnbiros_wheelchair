@@ -24,10 +24,19 @@ EncoderThread::EncoderThread(const std::string& port)
 
 EncoderThread::~EncoderThread()
 {
-	this->shutdownThread();
-	pthread_mutex_destroy(&this->mtx);
-	this->enc->ClosePort();
+	// Notify the thread to stop	
+	pthread_mutex_lock(&this->mtx);
+	this->run = false;
+	pthread_mutex_unlock(&this->mtx);
+
+	// close port and delete encoder object
 	delete this->enc;
+	
+	// Wait the thread to join
+	pthread_join(this->encthread, NULL);
+
+	// Destroy the mutex
+	pthread_mutex_destroy(&this->mtx);
 }
 
 void EncoderThread::startThread()
@@ -42,19 +51,6 @@ void EncoderThread::startThread()
 
 }
 
-void EncoderThread::shutdownThread()
-{
-	printf("Killing EncoderThread\n");
-	
-	// notify the thread to stop
-	pthread_mutex_lock(&this->mtx);
-	this->run = false;
-	pthread_mutex_unlock(&this->mtx);
-
-	// Wait the thread to stop
-	pthread_join(this->encthread, NULL);
-}
-
 void* EncoderThread::runThread(void* data)
 {
 	EncoderThread* encth = (EncoderThread*)data;
@@ -64,12 +60,8 @@ void* EncoderThread::runThread(void* data)
 	
 	while (!bquit) {
 		// Read the wheel encoder
-		try {
-			d = encth->enc->readEncoder();
-		} catch (std::runtime_error& e) {
-			throw std::runtime_error(e.what());
-		}
-	
+		d = encth->enc->readEncoder();
+		
 		//HACK to supress spurious readings
  		if ((d > 100) || (d < -100))
 			d = 0;

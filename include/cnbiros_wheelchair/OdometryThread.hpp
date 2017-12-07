@@ -35,7 +35,6 @@ class OdometryThread {
 	private:
 		/* Manage the thread start/stop */
 		void startThread(void);
-		void shutdownThread(void);
 
 	private:	
 		/* Thread stuff */

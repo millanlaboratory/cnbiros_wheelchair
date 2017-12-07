@@ -14,7 +14,6 @@ class EncoderThread  {
 
 		/* Manage the start/stop of the thread */
 		void startThread();
-		void shutdownThread();
 		
 		/* Return the "delta" distance travelled since this function was last called. */
 		double getDelta(int &sequence);

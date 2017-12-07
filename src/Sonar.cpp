@@ -53,6 +53,16 @@ Sonar::~Sonar() {
 	this->closePort();
 }
 
+int Sonar::closePort(void) {
+
+	if(this->fd != -1) {
+		tcflush( this->fd, TCIFLUSH );
+		close(this->fd);
+	}
+
+	return 0;
+}
+
 int Sonar::getRevision()
 {
 	int myerrno, nread;
@@ -356,15 +366,7 @@ int Sonar::changeAddress(unsigned char old_addr, unsigned char new_addr)
 	return 0;
 }
 
-int Sonar::closePort(void) {
 
-	if(this->fd != -1) {
-		tcflush( this->fd, TCIFLUSH );
-		close(this->fd);
-	}
-
-	return 0;
-}
 
 	}
 }

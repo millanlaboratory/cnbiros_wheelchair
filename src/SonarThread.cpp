@@ -32,6 +32,7 @@ SonarThread::~SonarThread()
 	pthread_mutex_destroy(&this->mtx);
 	this->sr->closePort();
 	delete this->sr;
+	printf("Destroyed SonarThread object\n");
 }
 
 void SonarThread::startThread()

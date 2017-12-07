@@ -40,10 +40,22 @@ OdometryThread::OdometryThread(const std::string& lport, const std::string& rpor
 
 OdometryThread::~OdometryThread(void)
 {
-	this->shutdownThread();
-	pthread_mutex_destroy(&this->mtx);
+	printf("Killing OdometryThread\n");
+	
+	// Delete the two encoders (the related thread will stop and join)
 	delete this->enc_left;
 	delete this->enc_right;
+
+	// Notify the thread to stop			
+	pthread_mutex_lock(&this->mtx);
+	this->run = false;
+	pthread_mutex_unlock(&this->mtx);
+
+	// Wait for the thread completion
+	pthread_join(this->odothread, NULL);
+
+	// Destroy the mutex
+	pthread_mutex_destroy(&this->mtx);
 }
 
 void OdometryThread::startThread(void)
@@ -54,19 +66,6 @@ void OdometryThread::startThread(void)
 	this->run = true;
 	pthread_create(&this->odothread, NULL, runThread, this);
 	pthread_mutex_unlock(&this->mtx);
-}
-
-void OdometryThread::shutdownThread(void)
-{
-	printf("Killing OdometryThread\n");
-
-	// Notify the thread to stop			
-	pthread_mutex_lock(&this->mtx);
-	this->run = false;
-	pthread_mutex_unlock(&this->mtx);
-
-	// Wait for the thread completion
-	pthread_join(this->odothread, NULL);
 }
 
 void* OdometryThread::runThread(void* data)

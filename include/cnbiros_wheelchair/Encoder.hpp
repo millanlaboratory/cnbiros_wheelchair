@@ -26,7 +26,7 @@ class Encoder {
 		int readEncoder(); // This is a blocking function!
 
 		int flushEncoder();
-		void ClosePort();
+		int ClosePort();
 	
 	private:
 		/* Internal states */

@@ -36,16 +36,12 @@ Encoder::~Encoder() {
 	this->ClosePort();
 }
 
-void Encoder::ClosePort() {
+int Encoder::ClosePort() {
 	
 	if (this->fd != -1) {
-		try {
-			this->flushEncoder();
-		} catch (std::runtime_error& e) {
-			throw std::runtime_error(e.what());
-		}
 		close(this->fd);
 	}
+	return 0;
 }
 
 int Encoder::setupPort(const char* port)
