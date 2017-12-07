@@ -40,13 +40,7 @@ Sonar::Sonar(const char* port, int n_sonar,
 		for (int i = 0; i < N_SONAR; i++){
 			this->setAnalogueGain(this->address_book[i], max_gains[i]);
 		}
-	} else {
-		for (int i = 0; i < N_SONAR; i++){
-			this->setAnalogueGain(this->address_book[i], 0x10);
-		}
 	}
-
-	
 }
 
 Sonar::~Sonar() {

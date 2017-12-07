@@ -13,9 +13,9 @@
 #include "cnbiros_wheelchair/SetMinRange.h"
 #include "cnbiros_wheelchair/SetFieldOfView.h"
 
-#define CNBIROS_WHEELCHAIR_ULTRASONICS_FIELDOFVIEW	0.52f
-#define CNBIROS_WHEELCHAIR_ULTRASONICS_MAXRANGE		0.80f
-#define CNBIROS_WHEELCHAIR_ULTRASONICS_MINRANGE		0.06f
+#define CNBIROS_WHEELCHAIR_ULTRASONICS_FIELDOFVIEW	0.08f // ~5 degrees
+#define CNBIROS_WHEELCHAIR_ULTRASONICS_MAXRANGE		6.00f
+#define CNBIROS_WHEELCHAIR_ULTRASONICS_MINRANGE		0.05f
 
 namespace cnbiros {
 	namespace wheelchair {

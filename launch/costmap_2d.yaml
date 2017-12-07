@@ -26,8 +26,8 @@ costmap:
         mark_threshold: 0
         combination_method: 1
         track_unknown_space: true
-        obstacle_range: 2.5
-        raytrace_range: 3.0
+        obstacle_range: 4.0
+        raytrace_range: 6.0
         publish_voxel_map: false
         observation_sources: kinect_scan
         kinect_scan: 
@@ -38,13 +38,15 @@ costmap:
             min_obstacle_height: 0.0
             max_obstacle_height: 3.0
     sonars_layer:
-        clear_threshold:    0.9
-        mark_threshold:     0.99
-        no_readings_timeout: 0.0
-        topics: ["/sonars/0xe0", "/sonars/0xe2", "/sonars/0xe4", "/sonars/0xe6", "/sonars/0xe8", "/sonars/0xea", "/sonars/0xec", "/sonars/0xee", "/sonars/0xf0", "/sonars/0xf2"]
+        #enabled: true
+        #marking: true 
+        #clearing: true 
+        #obstacle_range: 0.3
+        #raytrace_range: 6.0
         clear_on_max_reading: true
-        raytrace_range: 0.8
-        inf_is_valid: true
+        clear_threshold: 1.0
+        mark_threshold: 0.95
+        topics: ["/sonars/0xe0", "/sonars/0xe2", "/sonars/0xe4", "/sonars/0xe6", "/sonars/0xe8", "/sonars/0xea", "/sonars/0xec", "/sonars/0xee", "/sonars/0xf0", "/sonars/0xf2"]
     inflation_layer:
         enabled: true
         cost_scaling_factor: 5.0

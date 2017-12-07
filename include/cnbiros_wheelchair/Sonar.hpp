@@ -15,7 +15,7 @@
 #include <string>
 #include <iostream>
 
-const int MAX_SONAR = 16; // // MAX 16 per I2C bus
+const int MAX_SONAR = 5; // // MAX 16 per I2C bus
 
 namespace cnbiros {
 	namespace wheelchair {

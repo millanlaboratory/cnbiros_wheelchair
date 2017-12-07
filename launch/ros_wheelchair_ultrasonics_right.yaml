@@ -7,5 +7,5 @@ addresses:
     - 0xe4
     - 0xe6
     - 0xe8
-maxrange: 0.40
+maxrange: 1.0
 
