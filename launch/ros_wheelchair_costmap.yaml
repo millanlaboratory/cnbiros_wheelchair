@@ -38,15 +38,26 @@ costmap:
             min_obstacle_height: 0.0
             max_obstacle_height: 3.0
     sonars_layer:
-        #enabled: true
+        enabled: true
         #marking: true 
         #clearing: true 
         #obstacle_range: 0.3
         #raytrace_range: 6.0
         clear_on_max_reading: true
-        clear_threshold: 1.0
-        mark_threshold: 0.95
-        topics: ["/sonars/0xe0", "/sonars/0xe2", "/sonars/0xe4", "/sonars/0xe6", "/sonars/0xe8", "/sonars/0xea", "/sonars/0xec", "/sonars/0xee", "/sonars/0xf0", "/sonars/0xf2"]
+        #clear_threshold: 1.0
+        #mark_threshold: 0.95
+        topics: 
+            - "/sonars/0xe0_filtered"
+            - "/sonars/0xe2_filtered"
+            - "/sonars/0xe4_filtered"
+            - "/sonars/0xe6_filtered"
+            - "/sonars/0xe8_filtered"
+            - "/sonars/0xea_filtered"
+            - "/sonars/0xec_filtered"
+            - "/sonars/0xee_filtered"
+            - "/sonars/0xf0_filtered"
+            - "/sonars/0xf2_filtered"
+        #topics: ["/sonars/0xe0", "/sonars/0xe2", "/sonars/0xe4", "/sonars/0xe6", "/sonars/0xe8", "/sonars/0xea", "/sonars/0xec", "/sonars/0xee", "/sonars/0xf0", "/sonars/0xf2"]
     inflation_layer:
         enabled: true
         cost_scaling_factor: 5.0

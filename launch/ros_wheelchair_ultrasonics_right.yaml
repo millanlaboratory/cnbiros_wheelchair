@@ -1,11 +1,13 @@
 # Ultrasonic sensors parameters
 
-port: /dev/sonars.right #/dev/ttyACM0
+port: /dev/sonars.right # If udev rules not provided: /dev/ttyACM0
 addresses:
     - 0xe0
     - 0xe2
     - 0xe4
     - 0xe6
     - 0xe8
-maxrange: 1.0
+maxrange: 1.0           # If not specified deafults to 6.00 [m]
+#minrange: 0.0          # If not specified deafults to 0.05 [m]
+#fieldofview: 0.0       # If not specified deafults to 0.08 [rad]
 

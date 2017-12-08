@@ -1,0 +1,20 @@
+# Ultrasonic filters parameter
+
+topic_list: 
+    - '/sonars/0xe0'
+    - '/sonars/0xe2'
+    - '/sonars/0xe4' 
+    - '/sonars/0xe6'
+    - '/sonars/0xe8'
+    - '/sonars/0xea'
+    - '/sonars/0xec'
+    - '/sonars/0xee' 
+    - '/sonars/0xf0'
+    - '/sonars/0xf2'
+
+range_filter_chain:
+- name: range_threshold_filter
+  type: cnbiros/range_filters/RangeThresholdFilter
+  params:
+    upper_threshold: 0.4            # Required
+    #lower_threshold: 0.0           # if not specified defaults to 0.0

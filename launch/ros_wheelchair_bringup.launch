@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- *************************** Sensors *********************************** -->
+
+	<!-- *********** UltraSonic sensors ***************** -->	
+	<node name="sonars_right" pkg="cnbiros_wheelchair" type="ros_wheelchair_ultrasonics" output="screen" respawn="true" respawn_delay="10">
+		<rosparam command="load" file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_ultrasonics_right.yaml"/>
+	</node>	
+	<node name="sonars_left" pkg="cnbiros_wheelchair" type="ros_wheelchair_ultrasonics" output="screen" respawn="true" respawn_delay="10">
+		<rosparam command="load" file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_ultrasonics_left.yaml"/>
+	</node>	
+
+	<!-- *********** UltraSonic filters ***************** -->	
+	<node pkg="cnbiros_filters" type="multi_range_to_range_filter_chain" output="screen" name="sonars_filters">
+		<rosparam command="load" file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_ultrasonics_filters.yaml" />
+	</node>
+	
+	<!-- *********** Kinect LaserScan ***************** -->		
+	<include file="$(find cnbiros_wheelchair)/launch/ros_kinect_to_laserscan.launch">
+		<remap from="camera_link" to="kinect_link" />
+	</include>
+
+<!-- *************************** Motors ************************************ -->
+
+	<!-- *********** Motors ***************** -->	
+	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_motors.launch">
+		<arg name="port" value="/dev/controller" />
+	</include>
+	
+	
+	<!-- *********** Odometry ***************** -->	
+	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_odometry.launch">
+		<arg name="lport" value="/dev/encoder.left" />
+		<arg name="rport" value="/dev/encoder.right" />
+		<arg name="revolution" value="280" />
+	</include>
+
+<!-- *************************** Costmap *********************************** -->
+
+	<node name="costmap" pkg="costmap_2d" type="costmap_2d_node">
+		<rosparam file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_costmap.yaml" command="load" ns="/costmap"/>
+	</node>
+
+
+<!-- ************************ Transformations ****************************** -->
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
+	<node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
+	<param name="robot_description" textfile="$(find cnbiros_wheelchair)/model/wheelchair.urdf" />
+
+<!-- ************************** Visualization ****************************** -->
+	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find cnbiros_wheelchair)/rviz/ros_wheelchair_costmap.rviz" />
+
+</launch>

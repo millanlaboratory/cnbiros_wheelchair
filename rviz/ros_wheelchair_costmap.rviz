@@ -54,7 +54,7 @@ Visualization Manager:
       Enabled: true
       Name: Sonar0
       Queue Size: 100
-      Topic: /sonars/0xe0
+      Topic: /sonars/0xe0_filtered
       Unreliable: false
       Value: true
     - Alpha: 0.5
@@ -64,7 +64,7 @@ Visualization Manager:
       Enabled: true
       Name: Sonar1
       Queue Size: 100
-      Topic: /sonars/0xe2
+      Topic: /sonars/0xe2_filtered
       Unreliable: false
       Value: true
     - Alpha: 0.5
@@ -74,7 +74,7 @@ Visualization Manager:
       Enabled: true
       Name: Sonar2
       Queue Size: 100
-      Topic: /sonars/0xe4
+      Topic: /sonars/0xe4_filtered
       Unreliable: false
       Value: true
     - Alpha: 0.5
@@ -84,7 +84,7 @@ Visualization Manager:
       Enabled: true
       Name: Sonar3
       Queue Size: 100
-      Topic: /sonars/0xe6
+      Topic: /sonars/0xe6_filtered
       Unreliable: false
       Value: true
     - Alpha: 0.5
@@ -94,7 +94,7 @@ Visualization Manager:
       Enabled: true
       Name: Sonar4
       Queue Size: 100
-      Topic: /sonars/0xe8
+      Topic: /sonars/0xe8_filtered
       Unreliable: false
       Value: true
     - Alpha: 0.5
@@ -104,7 +104,7 @@ Visualization Manager:
       Enabled: true
       Name: Sonar5
       Queue Size: 100
-      Topic: /sonars/0xea
+      Topic: /sonars/0xea_filtered
       Unreliable: false
       Value: true
     - Alpha: 0.5
@@ -114,7 +114,7 @@ Visualization Manager:
       Enabled: true
       Name: Sonar6
       Queue Size: 100
-      Topic: /sonars/0xec
+      Topic: /sonars/0xec_filtered
       Unreliable: false
       Value: true
     - Alpha: 0.5
@@ -124,7 +124,7 @@ Visualization Manager:
       Enabled: true
       Name: Sonar7
       Queue Size: 100
-      Topic: /sonars/0xee
+      Topic: /sonars/0xee_filtered
       Unreliable: false
       Value: true
     - Alpha: 0.5
@@ -134,7 +134,7 @@ Visualization Manager:
       Enabled: true
       Name: Sonar8
       Queue Size: 100
-      Topic: /sonars/0xf0
+      Topic: /sonars/0xf0_filtered
       Unreliable: false
       Value: true
     - Alpha: 0.5
@@ -144,7 +144,7 @@ Visualization Manager:
       Enabled: true
       Name: Sonar9
       Queue Size: 100
-      Topic: /sonars/0xf2
+      Topic: /sonars/0xf2_filtered
       Unreliable: false
       Value: true
     - Alpha: 1
