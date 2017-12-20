@@ -17,9 +17,7 @@
 	</node>
 	
 	<!-- *********** Kinect LaserScan ***************** -->		
-	<include file="$(find cnbiros_wheelchair)/launch/ros_kinect_to_laserscan.launch">
-		<remap from="camera_link" to="kinect_link" />
-	</include>
+	<include file="$(find cnbiros_wheelchair)/launch/ros_kinect_to_laserscan.launch" />
 
 <!-- *************************** Costmap *********************************** -->
 	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_costmap.launch" />
