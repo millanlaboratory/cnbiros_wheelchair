@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+<!-- *************************** Costmap *********************************** -->
+	<node name="costmap" pkg="costmap_2d" type="costmap_2d_node">
+		<rosparam file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_costmap.yaml" command="load" ns="/costmap"/>
+	</node>
+</launch>
+

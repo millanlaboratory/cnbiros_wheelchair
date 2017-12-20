@@ -21,34 +21,34 @@
 		<remap from="camera_link" to="kinect_link" />
 	</include>
 
-<!-- *************************** Motors ************************************ -->
+<!-- *************************** Costmap *********************************** -->
+	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_costmap.launch" />
 
-	<!-- *********** Motors ***************** -->	
+<!-- *************************** Motors ************************************ -->
 	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_motors.launch">
 		<arg name="port" value="/dev/controller" />
 	</include>
 	
 	
-	<!-- *********** Odometry ***************** -->	
+<!-- *************************** Odometry ************************************ -->
 	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_odometry.launch">
 		<arg name="lport" value="/dev/encoder.left" />
 		<arg name="rport" value="/dev/encoder.right" />
 		<arg name="revolution" value="280" />
 	</include>
 
-<!-- *************************** Costmap *********************************** -->
-
-	<node name="costmap" pkg="costmap_2d" type="costmap_2d_node">
-		<rosparam file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_costmap.yaml" command="load" ns="/costmap"/>
-	</node>
-
-
 <!-- ************************ Transformations ****************************** -->
 	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
 	<node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
-	<param name="robot_description" textfile="$(find cnbiros_wheelchair)/model/wheelchair.urdf" />
+
+<!-- ************************ Model ****************************** -->
+	<include file="$(find cnbiros_wheelchair_description)/launch/ros_wheelchair_description.launch" />
+
+	<!-- <param name="robot_description" textfile="$(find cnbiros_wheelchair_description)/model/wheelchair.urdf" /> -->
 
 <!-- ************************** Visualization ****************************** -->
-	<node name="rviz" pkg="rviz" type="rviz" args="-d $(find cnbiros_wheelchair)/rviz/ros_wheelchair_costmap.rviz" />
+	<include file="$(find cnbiros_wheelchair_description)/launch/ros_wheelchair_rviz.launch" />
+
+	<!-- <node name="rviz" pkg="rviz" type="rviz" args="-d $(find cnbiros_wheelchair)/rviz/ros_wheelchair_costmap.rviz" /> -->
 
 </launch>

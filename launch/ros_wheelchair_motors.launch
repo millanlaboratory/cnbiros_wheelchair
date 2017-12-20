@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
 	<arg name="port" default="/dev/controller" />
 	<node name="motors" pkg="cnbiros_wheelchair" type="ros_wheelchair_motors" output="screen">

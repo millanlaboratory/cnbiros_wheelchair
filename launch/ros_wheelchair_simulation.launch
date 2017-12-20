@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- *************************** Parameters ******************************** -->
+	<arg name="worldname" default="empty.world" />
+
+<!-- *************************** Gazebo *********************************** -->
+	<include file="$(find cnbiros_wheelchair_gazebo)/launch/ros_wheelchair_gazebo.launch" >
+		<arg name="world" value="$(arg worldname)" />
+	</include>
+
+<!-- *************************** Costmap *********************************** -->
+	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_costmap.launch">
+	</include>
+
+<!-- ************************ Transformations ****************************** -->
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
+	<node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
+	<node pkg="tf" type="static_transform_publisher" name="base_footprint_broadcaster" args="0 0 0 0 0 0 base_footprint base_link 100" />
+
+<!-- ************************ Model ****************************** -->
+	<include file="$(find cnbiros_wheelchair_description)/launch/ros_wheelchair_description.launch" />
+
+<!-- ************************** Visualization ****************************** -->
+	<include file="$(find cnbiros_wheelchair_description)/launch/ros_wheelchair_rviz.launch" />
+
+</launch>

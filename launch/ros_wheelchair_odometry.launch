@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
 	<arg name="lport" default="/dev/encoder.left" />
 	<arg name="rport" default="/dev/encoder.right" />
