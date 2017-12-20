@@ -22,6 +22,8 @@
 	<include file="$(find cnbiros_wheelchair_description)/launch/ros_wheelchair_description.launch" />
 
 <!-- ************************** Visualization ****************************** -->
-	<include file="$(find cnbiros_wheelchair_description)/launch/ros_wheelchair_rviz.launch" />
+	<include file="$(find cnbiros_wheelchair_description)/launch/ros_wheelchair_rviz.launch">
+		<arg name="rvizcfg" value="wheelchair_footprint.rviz" />
+	</include>
 
 </launch>
