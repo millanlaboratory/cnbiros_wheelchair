@@ -24,4 +24,6 @@
   <build_depend>cnbiros_core</build_depend>
   <run_depend>cnbiros_core</run_depend>
 
+  <run_depend>cnbiros_wheelchair_description</run_depend>
+  <run_depend>cnbiros_wheelchair_gazebo</run_depend>
 </package>
