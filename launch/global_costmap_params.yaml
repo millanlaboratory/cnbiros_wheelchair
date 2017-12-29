@@ -1,5 +1,10 @@
 global_costmap:
-  global_frame: /map
+  global_frame: odom
   robot_base_frame: base_link
   update_frequency: 5.0
   static_map: false
+  rolling_window: true
+  width: 20
+  height: 20
+  origin_x: 10
+  origin_y: 10

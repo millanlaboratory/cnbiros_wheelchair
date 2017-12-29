@@ -9,6 +9,10 @@
 		<arg name="world" value="$(arg worldname)" />
 	</include>
 
+<!-- *************************** Costmap *********************************** -->
+	<include file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_costmap.launch">
+	</include>
+
 <!-- ************************ Transformations ****************************** -->
 	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
 	<node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
@@ -18,10 +22,8 @@
 	<include file="$(find cnbiros_wheelchair_description)/launch/ros_wheelchair_description.launch" />
 
 <!-- ************************** Visualization ****************************** -->
-<!--
 	<include file="$(find cnbiros_wheelchair_description)/launch/ros_wheelchair_rviz.launch">
-		<arg name="config" value="wheelchair_simulation_gazebo.rviz" />
+		<arg name="rvizcfg" value="wheelchair_simulation_gazebo.rviz" />
 	</include>
-	-->
 
 </launch>
