@@ -16,6 +16,7 @@
 #include <iostream>
 
 const int MAX_SONAR = 5; // // MAX 16 per I2C bus
+#define DEFAULT_SONAR_GAIN 0x08
 
 namespace cnbiros {
 	namespace wheelchair {
