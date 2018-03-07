@@ -1,12 +1,17 @@
 # Ultrasonic sensors parameters
 
 port: /dev/sonars.left  # If udev rules not provided: /dev/ttyACM1
+#addresses:
+#    - 0xea
+#    - 0xec
+#    - 0xee
+#    - 0xf0
+#    - 0xf2
 addresses:
     - 0xea
     - 0xec
-    - 0xee
-    - 0xf0
-    - 0xf2
+    - 0xe0
+    - 0xe2
 maxrange: 1.0           # If not specified deafults to 6.00 [m]
 #minrange: 0.0          # If not specified deafults to 0.05 [m]
 #fieldofview: 0.0       # If not specified deafults to 0.08 [rad]
