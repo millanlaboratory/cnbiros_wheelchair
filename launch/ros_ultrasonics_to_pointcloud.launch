@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<launch>
+	<arg name="ultrasonics_params" default="$(find cnbiros_wheelchair)/params/ros_wheelchair_ultrasonics_to_pointcloud.yaml"/>
+	<node pkg="cnbiros_wheelchair" type="ros_wheelchair_ultrasonics_to_pointcloud" output="screen" name="ros_wheelchair_ultrasonics_to_pointcloud" >
+	  <rosparam subst_value="True" file="$(arg ultrasonics_params)" command="load" />
+  </node>
+</launch>

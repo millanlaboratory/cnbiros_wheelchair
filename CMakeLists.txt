@@ -46,7 +46,8 @@ add_library(cnbiros_wheelchair
 			src/Odometry.cpp
 			src/Sonar.cpp
 			src/SonarThread.cpp
-			src/UltraSonics.cpp)
+			src/UltraSonics.cpp
+			src/UltraSonicsToPointCloud.cpp)
 add_dependencies(cnbiros_wheelchair cnbiros_wheelchair_generate_messages_cpp)
 target_link_libraries(cnbiros_wheelchair
 					  ${catkin_LIBRARIES})
@@ -86,3 +87,7 @@ target_link_libraries(ros_wheelchair_odometry cnbiros_wheelchair)
 add_executable(ros_wheelchair_ultrasonics src/ros_wheelchair_ultrasonics.cpp)
 add_dependencies(ros_wheelchair_ultrasonics cnbiros_wheelchair_generate_messages_cpp)
 target_link_libraries(ros_wheelchair_ultrasonics cnbiros_wheelchair)
+
+add_executable(ros_wheelchair_ultrasonics_to_pointcloud src/ros_wheelchair_ultrasonics_to_pointcloud.cpp)
+add_dependencies(ros_wheelchair_ultrasonics_to_pointcloud cnbiros_wheelchair_generate_messages_cpp)
+target_link_libraries(ros_wheelchair_ultrasonics_to_pointcloud cnbiros_wheelchair)
