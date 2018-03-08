@@ -1,8 +1,10 @@
 <?xml version="1.0"?>
 <launch>
+	
+	<arg name="ultrasonics_params" default="$(find cnbiros_wheelchair)/params/ros_wheelchair_ultrasonics_to_pointcloud.yaml"/>
+	<arg name="enable_sonars" default="0" />
 
 <!-- *************************** Sensors *********************************** -->
-	<arg name="enable_sonars" default="0" />
 	<group if="$(arg enable_sonars)">
 	<!-- *********** UltraSonic sensors ***************** -->	
 	<node name="sonars_right" pkg="cnbiros_wheelchair" type="ros_wheelchair_ultrasonics" output="screen" respawn="true" respawn_delay="10">
@@ -15,6 +17,12 @@
 	<node pkg="cnbiros_filters" type="multi_range_to_range_filter_chain" output="screen" name="sonars_filters">
 		<rosparam command="load" file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_ultrasonics_filters.yaml" />
 	</node>
+
+	<!-- *********** UltraSonic to pointcloud ***************** -->	
+	<node pkg="cnbiros_wheelchair" type="ros_wheelchair_ultrasonics_to_pointcloud" output="screen" name="ros_wheelchair_ultrasonics_to_pointcloud" >
+		<rosparam subst_value="True" file="$(arg ultrasonics_params)" command="load" />
+	</node>
+
 	</group>
 	<!-- *********** Kinect LaserScan ***************** -->		
 	<include file="$(find cnbiros_wheelchair)/launch/ros_kinect_to_laserscan.launch" />

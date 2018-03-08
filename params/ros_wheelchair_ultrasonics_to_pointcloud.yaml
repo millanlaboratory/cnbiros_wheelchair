@@ -1,11 +1,11 @@
 frame_id: "base_link"
 pointcloud: "/sonar_pointcloud"
 topics: 
-    - "sonars_0xe0_filtered"
-    - "sonars_0xe2_filtered"
-    - "sonars_0xe4_filtered"
-    - "sonars_0xe6_filtered"
-    - "sonars_0xe8_filtered"
-    - "sonars_0xf0_filtered"
-    - "sonars_0xf2_filtered"
+    - "sonars/0xe0_filtered"
+    - "sonars/0xe2_filtered"
+    - "sonars/0xe4_filtered"
+    - "sonars/0xe6_filtered"
+    - "sonars/0xe8_filtered"
+    - "sonars/0xf0_filtered"
+    - "sonars/0xf2_filtered"
 

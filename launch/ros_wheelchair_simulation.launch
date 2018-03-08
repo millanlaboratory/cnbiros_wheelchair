@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <launch>
+	<arg name="ultrasonics_params" default="$(find cnbiros_wheelchair)/params/ros_wheelchair_ultrasonics_to_pointcloud.yaml"/>
 
 <!-- *************************** Parameters ******************************** -->
 	<arg name="worldname" default="empty.world" />
@@ -8,6 +9,17 @@
 	<include file="$(find cnbiros_wheelchair_gazebo)/launch/ros_wheelchair_gazebo.launch" >
 		<arg name="world" value="$(arg worldname)" />
 	</include>
+
+	<!-- *********** UltraSonic filters ***************** -->	
+	<node pkg="cnbiros_filters" type="multi_range_to_range_filter_chain" output="screen" name="sonars_filters">
+		<rosparam command="load" file="$(find cnbiros_wheelchair)/launch/ros_wheelchair_ultrasonics_filters.yaml" />
+	</node>
+
+	<!-- *********** UltraSonic to pointcloud ***************** -->	
+	<node pkg="cnbiros_wheelchair" type="ros_wheelchair_ultrasonics_to_pointcloud" output="screen" name="ros_wheelchair_ultrasonics_to_pointcloud" >
+		<rosparam subst_value="True" file="$(arg ultrasonics_params)" command="load" />
+	</node>
+
 
 <!-- ************************ Transformations ****************************** -->
 	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
