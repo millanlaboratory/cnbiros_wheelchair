@@ -13,7 +13,7 @@ addresses:
     - 0xe0
     - 0xe2
     - 0xe8
-maxrange: 1.0           # If not specified deafults to 6.00 [m]
+maxrange: 6.0           # If not specified deafults to 6.00 [m]
 #minrange: 0.0          # If not specified deafults to 0.05 [m]
 #fieldofview: 0.0       # If not specified deafults to 0.08 [rad]
 

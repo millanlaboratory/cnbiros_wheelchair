@@ -6,7 +6,7 @@
 namespace cnbiros {
 	namespace wheelchair {
 
-UltraSonicsToPointCloud::UltraSonicsToPointCloud(void) : private_nh_("~") {
+UltraSonicsToPointCloud::UltraSonicsToPointCloud(void) : private_nh_("~"), listener_(ros::Duration(10)) {
 
 	// Configure node
 	this->configure();
@@ -44,7 +44,6 @@ bool UltraSonicsToPointCloud::configure(void) {
 
 void UltraSonicsToPointCloud::on_received_ultrasonic(const sensor_msgs::Range& msg) {
 
-	printf("New message:\n");
 	geometry_msgs::PointStamped	range_point;
 
 	// Fill the local range point with the message values
@@ -70,26 +69,20 @@ void UltraSonicsToPointCloud::on_received_ultrasonic(const sensor_msgs::Range& m
 	//current_point.z = cloud_point.point.z;
 
 	// Store the cloud point in readings_
-	printf("\tAdding to readings...");
 	this->readings_.emplace_back(range_point);
-	printf("...done\n");
 	
 }
 
 void UltraSonicsToPointCloud::Run(void) {
-	ros::Rate rate(10);
+	ros::Rate rate(5);
 
-	tf::TransformListener		listener;
 	geometry_msgs::PointStamped	cloud_point;
 	geometry_msgs::Point32		simple_point;
-	
+
+	this->listener_.setExtrapolationLimit(ros::Duration(1));
 	while(this->nh_.ok()) {
 
-		printf("Start while loop\n");
-		if(this->readings_.empty() == true) {
-			printf("empty readings\n");
-		} else {
-			printf("convert readings\n");
+		if(this->readings_.empty() == false) {
 
 			// For each point in the readings vector, make a transformation on
 			// the point cloud frame and add to the point cloud
@@ -98,13 +91,12 @@ void UltraSonicsToPointCloud::Run(void) {
 				// Transform the current reading point (sensor frame) to the
 				// pointcloud frame
 				try {
-					printf("\tWait for transform...");
-					listener.waitForTransform(this->frame_id_, (*it).header.frame_id, 
-											  ros::Time(0), ros::Duration(10.0));
-					printf("..tranform ready\n");
-					listener.transformPoint(this->frame_id_, (*it), cloud_point);
+					this->listener_.waitForTransform(this->frame_id_, (*it).header.frame_id, 
+											  ros::Time::now() - ros::Duration(0.05), ros::Duration(10.0));
+					this->listener_.transformPoint(this->frame_id_, (*it), cloud_point);
 				} catch (tf::TransformException &ex) {
 					ROS_ERROR("%s", ex.what());
+					continue;
 				}
 
 				// Convert the current Point in the cloud_point (PointStamped)
@@ -123,27 +115,18 @@ void UltraSonicsToPointCloud::Run(void) {
 			this->pointcloud_.header.frame_id = "base_link";
 			this->pointcloud_.header.stamp	  = ros::Time::now();
 
-			printf("publishing...");
 			// Publish the current pointcloud
 			this->pub_.publish(this->pointcloud_);
-			printf("... done\n");
 
 			// Reset the readings and the Pointcloud
-			printf("clearing...");
 			this->readings_.clear();
 			this->pointcloud_.points.clear();
-			printf("..done\n");
 		}
 		
-		printf("Sleep\n");
 		rate.sleep();
-		printf("SpinOnce\n");
 		ros::spinOnce();
-		
-
 	}
 
-	printf("Exit\n");
 }
 
 	}

@@ -40,6 +40,7 @@ UltraSonics::UltraSonics(ros::NodeHandle* node, unsigned int nsonars, std::strin
 	// Initialize publishers
 	this->setup_publishers(node, name);
 
+
 }
 
 UltraSonics::UltraSonics(ros::NodeHandle* node, const std::vector<unsigned char>& addresses,

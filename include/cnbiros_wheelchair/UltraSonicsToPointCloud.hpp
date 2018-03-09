@@ -39,6 +39,7 @@ class UltraSonicsToPointCloud {
 
 		sensor_msgs::PointCloud						pointcloud_;
 		std::vector<geometry_msgs::PointStamped>	readings_;
+		tf::TransformListener	listener_;
 
 };
 
