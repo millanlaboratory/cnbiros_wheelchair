@@ -16,10 +16,10 @@ range_filter_chain:
     - name: range_threshold_filter
       type: cnbiros/range_filters/RangeThresholdFilter
       params:
-        upper_threshold: 0.6            # Required
-        #lower_threshold: 0.0           # if not specified defaults to 0.0
+        upper_threshold: 0.8            # [m] Required
+        #lower_threshold: 0.1            # [m] if not specified defaults to 0.0
 
     - name: range_consistency_filter
       type: cnbiros/range_filters/RangeConsistencyFilter
       params:
-        consistency_time: 4.0           # Default [1.0 second]
+        consistency_time: 1.0           # Default [1.0 second]

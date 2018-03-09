@@ -44,6 +44,7 @@ bool UltraSonicsToPointCloud::configure(void) {
 
 void UltraSonicsToPointCloud::on_received_ultrasonic(const sensor_msgs::Range& msg) {
 
+	printf("New message:\n");
 	tf::TransformListener		listener;
 	geometry_msgs::PointStamped	range_point;
 	geometry_msgs::PointStamped	cloud_point;
@@ -57,8 +58,10 @@ void UltraSonicsToPointCloud::on_received_ultrasonic(const sensor_msgs::Range& m
 
 	// Try to transform the range point into cloud point
 	try {
+		printf("\tWait for transform...");
 		listener.waitForTransform(this->frame_id_, msg.header.frame_id, 
 								  ros::Time(0), ros::Duration(10.0));
+		printf("..tranform ready\n");
 		listener.transformPoint(this->frame_id_, range_point, cloud_point);
 	} catch (tf::TransformException &ex) {
 		ROS_ERROR("%s", ex.what());
@@ -69,39 +72,53 @@ void UltraSonicsToPointCloud::on_received_ultrasonic(const sensor_msgs::Range& m
 	current_point.z = cloud_point.point.z;
 
 	// Store the cloud point in readings_
+	printf("\tAdding to readings...");
 	this->readings_.emplace_back(current_point);
+	printf("...done\n");
 	
 }
 
 void UltraSonicsToPointCloud::Run(void) {
-	ros::Rate rate(1);
+	ros::Rate rate(10);
 
 	while(this->nh_.ok()) {
 
-		ros::spinOnce();
-		rate.sleep();
+		printf("Start while loop\n");
+		if(this->readings_.empty() == true) {
+			printf("empty readings\n");
+		} else {
+			printf("convert readings\n");
 
-		if(this->readings_.empty() == true)
-			continue;
+			// Convert the vector of Points into a point cloud
+			for(auto it=this->readings_.begin(); it!= this->readings_.end(); ++it) {
+				this->pointcloud_.points.emplace_back((*it));
+			}
 
-		// Convert the vector of Points into a point cloud
-		for(auto it=this->readings_.begin(); it!= this->readings_.end(); ++it) {
-			this->pointcloud_.points.emplace_back((*it));
+			// Update the header and timestamp
+			this->pointcloud_.header.frame_id = "base_link";
+			this->pointcloud_.header.stamp	  = ros::Time::now();
+
+			printf("publishing...");
+			// Publish the current pointcloud
+			this->pub_.publish(this->pointcloud_);
+			printf("... done\n");
+
+			// Reset the readings and the Pointcloud
+			printf("clearing...");
+			this->readings_.clear();
+			this->pointcloud_.points.clear();
+			printf("..done\n");
 		}
-
-		// Update the header and timestamp
-		this->pointcloud_.header.frame_id = "base_link";
-		this->pointcloud_.header.stamp	  = ros::Time::now();
-
-		// Publish the current pointcloud
-		this->pub_.publish(this->pointcloud_);
-
-		// Reset the readings and the Pointcloud
-		this->readings_.clear();
-		this->pointcloud_.points.clear();
+		
+		printf("Sleep\n");
+		rate.sleep();
+		printf("SpinOnce\n");
+		ros::spinOnce();
 		
 
 	}
+
+	printf("Exit\n");
 }
 
 	}

@@ -8,10 +8,11 @@ port: /dev/sonars.right # If udev rules not provided: /dev/ttyACM0
 #    - 0xe6
 #    - 0xe8
 addresses:
-    - 0xee
-    - 0xe4
-    - 0xf0
-    - 0xe6
+    - 0xea
+    - 0xec
+    - 0xe0
+    - 0xe2
+    - 0xe8
 maxrange: 1.0           # If not specified deafults to 6.00 [m]
 #minrange: 0.0          # If not specified deafults to 0.05 [m]
 #fieldofview: 0.0       # If not specified deafults to 0.08 [rad]
