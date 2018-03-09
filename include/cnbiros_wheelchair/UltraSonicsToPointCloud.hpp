@@ -37,8 +37,8 @@ class UltraSonicsToPointCloud {
 
 		std::string		frame_id_;
 
-		std::vector<geometry_msgs::Point32>		readings_;
-		sensor_msgs::PointCloud		pointcloud_;
+		sensor_msgs::PointCloud						pointcloud_;
+		std::vector<geometry_msgs::PointStamped>	readings_;
 
 };
 

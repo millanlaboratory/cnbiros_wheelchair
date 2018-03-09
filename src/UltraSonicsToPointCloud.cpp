@@ -45,35 +45,33 @@ bool UltraSonicsToPointCloud::configure(void) {
 void UltraSonicsToPointCloud::on_received_ultrasonic(const sensor_msgs::Range& msg) {
 
 	printf("New message:\n");
-	tf::TransformListener		listener;
 	geometry_msgs::PointStamped	range_point;
-	geometry_msgs::PointStamped	cloud_point;
-	geometry_msgs::Point32		current_point;
 
 	// Fill the local range point with the message values
-	range_point.header.frame_id  = msg.header.frame_id;
-	range_point.point.x = msg.range;
-	range_point.point.y = 0.0f;
-	range_point.point.z = 0.0f;
+	range_point.header.frame_id	= msg.header.frame_id;
+	range_point.header.stamp	= msg.header.stamp;
+	range_point.point.x			= msg.range;
+	range_point.point.y			= 0.0f;
+	range_point.point.z			= 0.0f;
 
 	// Try to transform the range point into cloud point
-	try {
-		printf("\tWait for transform...");
-		listener.waitForTransform(this->frame_id_, msg.header.frame_id, 
-								  ros::Time(0), ros::Duration(10.0));
-		printf("..tranform ready\n");
-		listener.transformPoint(this->frame_id_, range_point, cloud_point);
-	} catch (tf::TransformException &ex) {
-		ROS_ERROR("%s", ex.what());
-	}
+	//try {
+	//	printf("\tWait for transform...");
+	//	listener.waitForTransform(this->frame_id_, msg.header.frame_id, 
+	//							  ros::Time(0), ros::Duration(10.0));
+	//	printf("..tranform ready\n");
+	//	listener.transformPoint(this->frame_id_, range_point, cloud_point);
+	//} catch (tf::TransformException &ex) {
+	//	ROS_ERROR("%s", ex.what());
+	//}
 
-	current_point.x = cloud_point.point.x;
-	current_point.y = cloud_point.point.y;
-	current_point.z = cloud_point.point.z;
+	//current_point.x = cloud_point.point.x;
+	//current_point.y = cloud_point.point.y;
+	//current_point.z = cloud_point.point.z;
 
 	// Store the cloud point in readings_
 	printf("\tAdding to readings...");
-	this->readings_.emplace_back(current_point);
+	this->readings_.emplace_back(range_point);
 	printf("...done\n");
 	
 }
@@ -81,6 +79,10 @@ void UltraSonicsToPointCloud::on_received_ultrasonic(const sensor_msgs::Range& m
 void UltraSonicsToPointCloud::Run(void) {
 	ros::Rate rate(10);
 
+	tf::TransformListener		listener;
+	geometry_msgs::PointStamped	cloud_point;
+	geometry_msgs::Point32		simple_point;
+	
 	while(this->nh_.ok()) {
 
 		printf("Start while loop\n");
@@ -89,10 +91,33 @@ void UltraSonicsToPointCloud::Run(void) {
 		} else {
 			printf("convert readings\n");
 
-			// Convert the vector of Points into a point cloud
+			// For each point in the readings vector, make a transformation on
+			// the point cloud frame and add to the point cloud
 			for(auto it=this->readings_.begin(); it!= this->readings_.end(); ++it) {
-				this->pointcloud_.points.emplace_back((*it));
+			
+				// Transform the current reading point (sensor frame) to the
+				// pointcloud frame
+				try {
+					printf("\tWait for transform...");
+					listener.waitForTransform(this->frame_id_, (*it).header.frame_id, 
+											  ros::Time(0), ros::Duration(10.0));
+					printf("..tranform ready\n");
+					listener.transformPoint(this->frame_id_, (*it), cloud_point);
+				} catch (tf::TransformException &ex) {
+					ROS_ERROR("%s", ex.what());
+				}
+
+				// Convert the current Point in the cloud_point (PointStamped)
+				// into a Point32 (for the pointcloud)
+				simple_point.x = cloud_point.point.x;
+				simple_point.y = cloud_point.point.y;
+				simple_point.z = cloud_point.point.z;
+
+
+				// Add the current cloud point to the pointcloud
+				this->pointcloud_.points.emplace_back(simple_point);
 			}
+
 
 			// Update the header and timestamp
 			this->pointcloud_.header.frame_id = "base_link";
