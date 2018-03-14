@@ -44,6 +44,7 @@
 <!-- ************************ Transformations ****************************** -->
 	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" >
 		<param name="publish_frequency" value="200" />
+		<!-- <param name="use_tf_static" value="False" /> -->
 	</node>
 	<node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
 

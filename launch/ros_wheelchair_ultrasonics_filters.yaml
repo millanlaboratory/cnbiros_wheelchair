@@ -19,7 +19,7 @@ range_filter_chain:
         upper_threshold: 2.00            # [m] Required
         lower_threshold: 0.08            # [m] if not specified defaults to 0.0
 
-      #- name: range_consistency_filter
-      #- type: cnbiros/range_filters/RangeConsistencyFilter
-      #- params:
-      #-   consistency_time: 1.0           # Default [1.0 second]
+# - name: range_consistency_filter
+#      type: cnbiros/range_filters/RangeConsistencyFilter
+#      params:
+#        consistency_time: 2.0           # Default [1.0 second]

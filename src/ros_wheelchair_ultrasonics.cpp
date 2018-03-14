@@ -21,7 +21,7 @@ int main (int argc, char** argv) {
 	}
 
 	cnbiros::wheelchair::UltraSonics sonars(&node, addr);
-	sonars.SetRate(5);
+	sonars.SetRate(20);
 	
 	if(ros::param::get("~fieldofview", viewfield)) {
 		sonars.SetFieldOfView(viewfield);

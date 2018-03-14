@@ -79,7 +79,7 @@ void* SonarThread::runThread(void* data)
 
 		bquit = !srth->run;
 		pthread_mutex_unlock(&srth->mtx);
-		//usleep(2000);
+		usleep(2000);
 	}
 
 	return NULL;

@@ -74,12 +74,12 @@ void UltraSonicsToPointCloud::on_received_ultrasonic(const sensor_msgs::Range& m
 }
 
 void UltraSonicsToPointCloud::Run(void) {
-	ros::Rate rate(5);
+	ros::Rate rate(20);
 
 	geometry_msgs::PointStamped	cloud_point;
 	geometry_msgs::Point32		simple_point;
+	std::string errorstr;
 
-	this->listener_.setExtrapolationLimit(ros::Duration(1));
 	while(this->nh_.ok()) {
 
 		if(this->readings_.empty() == false) {
@@ -90,9 +90,9 @@ void UltraSonicsToPointCloud::Run(void) {
 			
 				// Transform the current reading point (sensor frame) to the
 				// pointcloud frame
+				this->listener_.waitForTransform(this->frame_id_, (*it).header.frame_id, 
+											  ros::Time::now() - ros::Duration(0.1), ros::Duration(10.0), ros::Duration(0.0001), &errorstr);
 				try {
-					this->listener_.waitForTransform(this->frame_id_, (*it).header.frame_id, 
-											  ros::Time::now() - ros::Duration(0.05), ros::Duration(10.0));
 					this->listener_.transformPoint(this->frame_id_, (*it), cloud_point);
 				} catch (tf::TransformException &ex) {
 					ROS_ERROR("%s", ex.what());
