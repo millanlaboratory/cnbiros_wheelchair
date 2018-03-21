@@ -1,7 +1,7 @@
 #/usr/bash
 function usage {
 	echo "usage: $0 RULEID"
-	echo "Possible RULEID: '-encoders' or '-sonars' or '-controller'"
+	echo "Possible RULEID: '-encoders' or '-sonars' or '-controller' or '-hokuyo'"
 }
 
 case "$1" in
@@ -13,6 +13,9 @@ case "$1" in
 		;;
 	"-controller")
 		RULENAME="99-usb-serial-controller.rules"
+		;;
+	"-hokuyo")
+		RULENAME="99-usb-serial-hokuyo.rules"
 		;;
 	*)
 		usage;
