@@ -56,22 +56,69 @@ int Motors::Open(const std::string& port) {
 
 int Motors::SetVelocity(float v, float w) {
 	int ret = -1;
+	float v_sign, w_sign;
+	float v_transformed, w_transformed;
 	if(this->dxgpsb_ != nullptr) {
-		if (v > CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX) {
-			ROS_WARN("Maximum linear velocity %f. Provided velocity: %f", 
-					 CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX, v);
-		} else if(v < CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN) {
-			ROS_WARN("Minimum linear velocity %f. Provided velocity: %f", 
-					 CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN, v);
-		} else if(w > CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX) {
-			ROS_WARN("Maximum rotation velocity %f. Provided velocity: %f", 
-					 CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX, w);
-		} else if(w < CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN) {
-			ROS_WARN("Minimum rotation velocity %f. Provided velocity: %f", 
-					 CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN, w);
+
+		//if (v > 0.0f) {
+		//	v += 0.3f;
+		//} else if(v < 0.0f) {
+		//	v += -0.3;
+		//}
+
+		//if( w > 0.0f) {
+		//	w += 0.58;
+		//} else if(w < 0.0f) {
+		//	w += -0.58;
+		//}
+		//
+		//if (v > CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX) {
+		//	//ROS_WARN("Maximum linear velocity %f. Provided velocity: %f", 
+		//	//		 CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX, v);
+		//	v = CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX;
+		//} else if(v < CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN) {
+		//	//ROS_WARN("Minimum linear velocity %f. Provided velocity: %f", 
+		//	//		 CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN, v);
+		//	v = CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN;
+		//} else if(w > CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX) {
+		//	//ROS_WARN("Maximum rotation velocity %f. Provided velocity: %f", 
+		//	//		 CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX, w);
+		//	w = CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX;
+		//} else if(w < CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN) {
+		//	//ROS_WARN("Minimum rotation velocity %f. Provided velocity: %f", 
+		//	//		 CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN, w);
+		//	w = CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN;
+		//}
+
+		//printf("[v, w] = [%f, %f]\n", v, w);
+
+		// Linear velocity transformation for profile 1
+		v_sign = v < 0.0f ? -1.0f : 1.0f;
+		w_sign = w < 0.0f ? -1.0f : 1.0f;
+
+		if(v == 0.0f) {
+			v_transformed = 0.0f;
 		} else {
-			ret = this->dxgpsb_->setVelocities(v, w);
+			//v_transformed = v_sign*(2.745f*fabs(v) + 0.30f);
+			//v_transformed = v_sign*(2.745f*fabs(v) + 0.10f);
+			v_transformed = v_sign*(2.745f*fabs(v) + 0.10f);
+			//v_transformed = v;
 		}
+
+		if(w == 0.0f) {
+			w_transformed = 0.0f;
+		} else {
+			//w_transformed = w_sign*(1.337f*fabs(w) + 0.59f);
+			//w_transformed = w_sign*(1.337f*fabs(w) + 0.10f);
+			w_transformed = w_sign*(1.337f*fabs(w));
+			//w_transformed = w;
+		}
+		
+		//w_transformed = w;
+		//printf("Velocity [v, w]: %f %f\n", v_transformed, w_transformed);
+
+
+		ret = this->dxgpsb_->setVelocities(v_transformed, w_transformed);
 	}
 
 	return ret;
