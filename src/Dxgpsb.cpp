@@ -102,9 +102,9 @@ int Dxgpsb::writeToDevice(int n_bytes, unsigned char* data) {
   	tcflush( this->fd, TCOFLUSH );
 
   	//printf("Sent packet:     0x");
-  	for (int i = 0; i < len_packet; i++){
-		//printf("%02X ", sdata[i]);
-  	}
+  	//for (int i = 0; i < len_packet; i++){
+	//	//printf("%02X ", sdata[i]);
+  	//}
   	//printf("\n");
 
   	return retval;
