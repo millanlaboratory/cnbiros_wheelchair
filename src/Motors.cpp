@@ -145,7 +145,7 @@ int Motors::Forward(float v) {
 void Motors::on_command_velocity(const geometry_msgs::Twist& msg) {
 
 	float v, w;
-	v = msg.linear.x;
+	v = -msg.linear.x;
 	w = -msg.angular.z;
 	this->SetVelocity(v, w);
 }
