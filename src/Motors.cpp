@@ -92,6 +92,7 @@ int Motors::SetVelocity(float v, float w) {
 
 		//printf("[v, w] = [%f, %f]\n", v, w);
 
+		/* Current 
 		// Linear velocity transformation for profile 1
 		v_sign = v < 0.0f ? -1.0f : 1.0f;
 		w_sign = w < 0.0f ? -1.0f : 1.0f;
@@ -116,9 +117,11 @@ int Motors::SetVelocity(float v, float w) {
 		
 		//w_transformed = w;
 		//printf("Velocity [v, w]: %f %f\n", v_transformed, w_transformed);
-
+		
 
 		ret = this->dxgpsb_->setVelocities(v_transformed, w_transformed);
+		*/
+		ret = this->dxgpsb_->setVelocities(v, w);
 	}
 
 	return ret;
@@ -145,7 +148,7 @@ int Motors::Forward(float v) {
 void Motors::on_command_velocity(const geometry_msgs::Twist& msg) {
 
 	float v, w;
-	v = -msg.linear.x;
+	v = msg.linear.x;
 	w = -msg.angular.z;
 	this->SetVelocity(v, w);
 }
