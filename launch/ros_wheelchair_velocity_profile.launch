@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<launch>
+
+<!-- ************************************************************** -->
+<!--						Arguments								-->
+<!-- ************************************************************** -->
+
+	<!-- Options -->
+	<arg name="bag_filename" />
+	<arg name="bag_folder"					default="/mnt/data/cnbitk_data/" />
+	<arg name="enable_encoders_odometry"	default="False" />	<!-- Until encoders are not mounted -->
+	<arg name="enable_rgb_odometry"			default="True" />	<!-- To be modified when encoder are mounted -->
+	<arg name="enable_recording"			default="True" />
+	<arg name="enable_controller"			default="False" />
+
+	<!-- Wheelchair parameters -->
+	<arg name="encoder_port_left"  default="/dev/encoder.left" />
+	<arg name="encoder_port_right" default="/dev/encoder.right" />
+	<arg name="wheel_axle" default="0.5240" />
+	<arg name="wheel_diameter" default="0.3556" />
+	<arg name="wheel_revolution" default="280" />
+	<arg name="controller_port" default="/dev/controller" />
+	<arg name="wheelchair_description"	default="$(find cnbiros_wheelchair_description)/urdf/wheelchair.urdf.xacro" />
+	
+
+
+
+
+<!-- ************************************************************** -->
+<!--						Wheelchair								-->
+<!-- ************************************************************** -->
+
+	<!-- Openni bringup -->
+	<include file="$(find openni_launch)/launch/openni.launch">
+		<arg name="depth_registration" value="True" />
+	</include>
+
+	<!-- Visual odometry - rtabmap -->
+	<group if="$(arg enable_rgb_odometry)">
+		<node pkg="rtabmap_ros" type="rgbd_odometry" name="rgbd_odometry" >
+			<remap from="/rgb/image/" to="/camera/rgb/image_rect_color"/>
+			<remap from="/depth/image/" to="/camera/depth_registered/image_raw"/>
+			<remap from="/rgb/camera_info/" to="/camera/rgb/camera_info" />
+		</node>
+	</group>
+	
+	<!-- Motors -->
+	<group if="$(arg enable_controller)">
+		<node name="motors" pkg="cnbiros_wheelchair" type="ros_wheelchair_motors" output="screen" >
+			<rosparam subst_value="True" param="port">$(arg controller_port)</rosparam>
+		</node>
+	</group>
+		
+
+	<!-- Odometry -->
+	<group if="$(arg enable_encoders_odometry)">
+		<node name="odometry" pkg="cnbiros_wheelchair" type="ros_wheelchair_odometry" output="screen" >
+			<rosparam subst_value="True" param="lport">$(arg encoder_port_left)</rosparam>
+			<rosparam subst_value="True" param="rport">$(arg encoder_port_right)</rosparam>
+			<rosparam subst_value="True" param="axle">$(arg wheel_axle)</rosparam>
+			<rosparam subst_value="True" param="diameter">$(arg wheel_diameter)</rosparam>
+			<rosparam subst_value="True" param="revolution">$(arg wheel_revolution)</rosparam>
+		</node>
+	</group>
+
+	<!-- Wheelchair description -->
+	<param name="robot_description" command="$(find xacro)/xacro --inorder $(arg wheelchair_description)" />
+
+	<!-- Transformations -->
+	<node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" />
+	<node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
+	
+
+
+<!-- ************************************************************** -->
+<!--						Bag										-->
+<!-- ************************************************************** -->
+	<group if="$(arg enable_recording)">
+		<node pkg="rosbag" type="record" name="rosbag_record" args=" -O $(arg bag_folder)/$(arg bag_filename) record /odom" />
+	</group>
+
+</launch>
