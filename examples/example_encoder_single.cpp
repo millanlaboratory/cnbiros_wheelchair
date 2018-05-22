@@ -52,7 +52,7 @@ int main( int argc, char *argv[] )
 	cnbiros::wheelchair::EncoderThread* encoder;
 
 	try {
-		encoder = new cnbiros::wheelchair::EncoderThread(argv[1]);
+		encoder = new cnbiros::wheelchair::EncoderThread(argv[1], true);
 	} catch (std::runtime_error& e) {
 		fprintf(stderr, "%s\n", e.what());
 		exit(EXIT_FAILURE);
