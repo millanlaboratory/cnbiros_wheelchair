@@ -6,7 +6,7 @@
 <!-- ************************************************************** -->
 
 	<!-- Options -->
-	<arg name="bag_filename" />
+	<arg name="bag_filename"				default="current.bag"/>
 	<arg name="bag_folder"					default="/mnt/data/cnbitk_data/" />
 	<arg name="enable_encoders_odometry"	default="False" />	<!-- Until encoders are not mounted -->
 	<arg name="enable_rgb_odometry"			default="True" />	<!-- To be modified when encoder are mounted -->
@@ -30,13 +30,13 @@
 <!--						Wheelchair								-->
 <!-- ************************************************************** -->
 
-	<!-- Openni bringup -->
-	<include file="$(find openni_launch)/launch/openni.launch">
-		<arg name="depth_registration" value="True" />
-	</include>
-
-	<!-- Visual odometry - rtabmap -->
 	<group if="$(arg enable_rgb_odometry)">
+		<!-- Openni bringup -->
+		<include file="$(find openni_launch)/launch/openni.launch">
+			<arg name="depth_registration" value="True" />
+		</include>
+
+		<!-- Visual odometry - rtabmap -->
 		<node pkg="rtabmap_ros" type="rgbd_odometry" name="rgbd_odometry" >
 			<remap from="/rgb/image/" to="/camera/rgb/image_rect_color"/>
 			<remap from="/depth/image/" to="/camera/depth_registered/image_raw"/>
@@ -76,7 +76,7 @@
 <!--						Bag										-->
 <!-- ************************************************************** -->
 	<group if="$(arg enable_recording)">
-		<node pkg="rosbag" type="record" name="rosbag_record" args=" -O $(arg bag_folder)/$(arg bag_filename) record /odom" />
+		<node pkg="rosbag" type="record" name="rosbag_record" args=" -O $(arg bag_folder)/$(arg bag_filename) record /odom /cmd_vel" />
 	</group>
 
 </launch>
