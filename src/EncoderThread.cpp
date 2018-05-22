@@ -6,10 +6,10 @@
 namespace cnbiros {
 	namespace wheelchair {
 
-EncoderThread::EncoderThread(const std::string& port)
+EncoderThread::EncoderThread(const std::string& port, bool verbose)
 {
 	try {
-		this->enc = new Encoder(port);
+		this->enc = new Encoder(port, verbose);
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(e.what());
 	}

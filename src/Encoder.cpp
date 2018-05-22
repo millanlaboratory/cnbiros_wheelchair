@@ -217,7 +217,9 @@ int Encoder::flushEncoder()
 	
 
 	for( tries = 0, nread = 0; tries < 256; tries++ ) {
+		printf("reading...\n");
 		nread = read( this->fd, &c, 1);
+		printf("...done\n");
 		if ( nread == -1 ) {
 			myerrno = errno;
 			throw std::runtime_error("FLUSH: read() failed: " + std::string(strerror(myerrno)));
@@ -236,7 +238,7 @@ int Encoder::flushEncoder()
 		}
 	}
 	
-	
+	printf("done\n");	
 	return 0;
 }
 

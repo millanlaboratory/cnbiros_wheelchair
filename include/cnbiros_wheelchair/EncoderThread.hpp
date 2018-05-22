@@ -9,7 +9,7 @@ namespace cnbiros {
 class EncoderThread  {
 
 	public:
-		EncoderThread(const std::string& port);
+		EncoderThread(const std::string& port, bool verbose = false);
 		~EncoderThread();
 
 		/* Manage the start/stop of the thread */
