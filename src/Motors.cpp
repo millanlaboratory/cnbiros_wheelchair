@@ -6,36 +6,49 @@
 namespace cnbiros {
 	namespace wheelchair {
 
-Motors::Motors(ros::NodeHandle* node) : 
-			   cnbiros::core::NodeInterface(node, "motors") {
+Motors::Motors(void) : private_nh_("~") {
 
 	// Initialize dxgpsb pointer
 	this->dxgpsb_ = nullptr;
-	
+
+	// Configure
+	this->configure();
+
+
 	// Initialize subscriber
-	this->rossub_ = node->subscribe("cmd_vel", 1, &Motors::on_command_velocity, this);
+	this->sub_ = this->nh_.subscribe("cmd_vel", 1, &Motors::on_command_velocity, this);
 
 	// Add services
-	this->rossrv_stop_ = node->advertiseService(
-						 ros::this_node::getName() + "/stop", 
-						 &Motors::on_srv_stop_, this);
-	
-	this->rossrv_forward_ = node->advertiseService(
-							ros::this_node::getName() + "/forward", 
-							&Motors::on_srv_forward_, this);
-	
-	this->rossrv_setvelocity_ = node->advertiseService(
-								ros::this_node::getName() + "/setvelocity", 
-								&Motors::on_srv_setvelocity_, this);
-	
-	this->rossrv_getvelocity_ = node->advertiseService(
-								ros::this_node::getName() + "/getvelocity", 
-								&Motors::on_srv_getvelocity_, this);
+	this->srv_stop_		   = this->private_nh_.advertiseService("stop", &Motors::on_srv_stop_, this);
+	this->srv_forward_	   = this->private_nh_.advertiseService("forward", &Motors::on_srv_forward_, this);
+	this->srv_setvelocity_ = this->private_nh_.advertiseService("setvelocity", &Motors::on_srv_setvelocity_, this);
+	this->srv_getvelocity_ = this->private_nh_.advertiseService("getvelocity", &Motors::on_srv_getvelocity_, this);
 }
 
 Motors::~Motors(void){
 	if(this->dxgpsb_ != nullptr)
 		delete this->dxgpsb_;
+}
+
+bool Motors::configure(void) {
+	this->private_nh_.param<std::string>("port", this->port_, "/dev/controller");
+	this->private_nh_.param<float>("max_vel_lin", this->max_vel_lin_, 0.290f);
+	this->private_nh_.param<float>("min_vel_lin", this->min_vel_lin_, -0.290f);
+	this->private_nh_.param<float>("max_vel_th", this->max_vel_th_, 0.300f);
+	this->private_nh_.param<float>("min_vel_th", this->min_vel_th_, -0.300f);
+
+	ROS_INFO("Motors controller port: %s", this->port_.c_str());
+	ROS_INFO("Motors maximum linear  velocity: %f", this->max_vel_lin_);
+	ROS_INFO("Motors minimum linear  velocity: %f", this->min_vel_lin_);
+	ROS_INFO("Motors maximum angular velocity: %f", this->max_vel_th_);
+	ROS_INFO("Motors minimum angular velocity: %f", this->min_vel_th_);
+
+	return true;
+
+}
+
+int Motors::Open(void) {
+	return this->Open(this->port_);
 }
 
 int Motors::Open(const std::string& port) {
@@ -45,6 +58,7 @@ int Motors::Open(const std::string& port) {
 	this->port_ = port;
 	try {
 		this->dxgpsb_ = new DxgpsbThread(this->port_);
+		ROS_INFO("Wheelchair motors connected at port %s", port.c_str());
 	} catch (std::runtime_error& e) {
 		throw std::runtime_error(e.what());
 		return -1;
@@ -56,75 +70,44 @@ int Motors::Open(const std::string& port) {
 
 int Motors::SetVelocity(float v, float w) {
 	int ret = -1;
-	float v_sign, w_sign;
-	float v_transformed, w_transformed;
+	float nv, nw;
+	float lv, lw;
 	if(this->dxgpsb_ != nullptr) {
 
-		//if (v > 0.0f) {
-		//	v += 0.3f;
-		//} else if(v < 0.0f) {
-		//	v += -0.3;
-		//}
+		nv = this->normalize_velocity(v, this->max_vel_lin_, this->min_vel_lin_);	
+		nw = this->normalize_velocity(w, this->max_vel_th_, this->min_vel_th_);	
 
-		//if( w > 0.0f) {
-		//	w += 0.58;
-		//} else if(w < 0.0f) {
-		//	w += -0.58;
-		//}
-		//
-		//if (v > CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX) {
-		//	//ROS_WARN("Maximum linear velocity %f. Provided velocity: %f", 
-		//	//		 CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX, v);
-		//	v = CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX;
-		//} else if(v < CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN) {
-		//	//ROS_WARN("Minimum linear velocity %f. Provided velocity: %f", 
-		//	//		 CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN, v);
-		//	v = CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN;
-		//} else if(w > CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX) {
-		//	//ROS_WARN("Maximum rotation velocity %f. Provided velocity: %f", 
-		//	//		 CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX, w);
-		//	w = CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX;
-		//} else if(w < CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN) {
-		//	//ROS_WARN("Minimum rotation velocity %f. Provided velocity: %f", 
-		//	//		 CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN, w);
-		//	w = CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN;
-		//}
+		lv = this->limit_velocity(nv, 1.0f, -1.0f);
+		lw = this->limit_velocity(nw, 1.0f, -1.0f);
+	
+		// Change sign for angular velocity
+		lw = -lw;
 
-		//printf("[v, w] = [%f, %f]\n", v, w);
+		ret = this->dxgpsb_->setVelocities(lv, lw);
 
-		/* Current 
-		// Linear velocity transformation for profile 1
-		v_sign = v < 0.0f ? -1.0f : 1.0f;
-		w_sign = w < 0.0f ? -1.0f : 1.0f;
-
-		if(v == 0.0f) {
-			v_transformed = 0.0f;
-		} else {
-			//v_transformed = v_sign*(2.745f*fabs(v) + 0.30f);
-			//v_transformed = v_sign*(2.745f*fabs(v) + 0.10f);
-			v_transformed = v_sign*(2.745f*fabs(v) + 0.10f);
-			//v_transformed = v;
-		}
-
-		if(w == 0.0f) {
-			w_transformed = 0.0f;
-		} else {
-			//w_transformed = w_sign*(1.337f*fabs(w) + 0.59f);
-			//w_transformed = w_sign*(1.337f*fabs(w) + 0.10f);
-			w_transformed = w_sign*(1.337f*fabs(w));
-			//w_transformed = w;
-		}
-		
-		//w_transformed = w;
-		//printf("Velocity [v, w]: %f %f\n", v_transformed, w_transformed);
-		
-
-		ret = this->dxgpsb_->setVelocities(v_transformed, w_transformed);
-		*/
-		ret = this->dxgpsb_->setVelocities(v, w);
+		ROS_DEBUG_NAMED("velocity_debug", "Actual velocities:     (%f, %f) [m/s]", v, w);
+		ROS_DEBUG_NAMED("velocity_debug", "Normalized velocities: (%f, %f) [-1, 1]", lv, lw);
 	}
 
 	return ret;
+}
+
+float Motors::normalize_velocity(float v, float max_v, float min_v) {
+
+	return 2.0f*((v - min_v)/(max_v - min_v)) - 1.0f;
+}
+
+float Motors::limit_velocity(float v, float max_v, float min_v) {
+	float lv;
+
+	if(v > max_v)
+		lv = max_v;
+	else if(v < min_v)
+		lv = min_v;
+	else
+		lv = v;
+
+	return lv;
 }
 
 int Motors::GetVelocity(float& v, float& w) {
@@ -149,7 +132,7 @@ void Motors::on_command_velocity(const geometry_msgs::Twist& msg) {
 
 	float v, w;
 	v = msg.linear.x;
-	w = -msg.angular.z;
+	w = msg.angular.z;
 	this->SetVelocity(v, w);
 }
 

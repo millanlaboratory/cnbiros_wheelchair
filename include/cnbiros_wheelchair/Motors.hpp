@@ -4,7 +4,6 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 
-#include "cnbiros_core/NodeInterface.hpp"
 #include "cnbiros_wheelchair/Stop.h"
 #include "cnbiros_wheelchair/Forward.h"
 #include "cnbiros_wheelchair/SetVelocity.h"
@@ -12,29 +11,31 @@
 
 #include "DxgpsbThread.hpp"
 
-#define CNBIROS_WHEELCHAIR_VELOCITY_DEFAULT			 0.5f
-#define CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MAX		 1.0f
-#define CNBIROS_WHEELCHAIR_VELOCITY_LINEAR_MIN		-1.0f
-#define CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MAX	 1.0f
-#define CNBIROS_WHEELCHAIR_VELOCITY_ROTATION_MIN	-1.0f
 
 namespace cnbiros {
 	namespace wheelchair {
 
-class Motors : public cnbiros::core::NodeInterface {
+class Motors {
 
 	public:
-		Motors(ros::NodeHandle* node);
+		Motors(void);
 		virtual ~Motors(void);
 
+		int Open(void);
 		int Open(const std::string& port);
 
 		int SetVelocity(float v, float w);
 		int GetVelocity(float& v, float& w);
 		int Stop(void);
-		int Forward(float v = CNBIROS_WHEELCHAIR_VELOCITY_DEFAULT);
+		int Forward(float v = 1.0f);
 
 	private:
+		virtual bool configure(void);
+		
+		float normalize_velocity(float v, float max_v, float min_v);
+		float limit_velocity(float v, float max_v = 1.0f, float min_v = -1.0f);
+
+
 		void on_command_velocity(const geometry_msgs::Twist& msg);
 		bool on_srv_stop_(cnbiros_wheelchair::Stop::Request& req,
 						  cnbiros_wheelchair::Stop::Response& res);
@@ -46,14 +47,21 @@ class Motors : public cnbiros::core::NodeInterface {
 								 cnbiros_wheelchair::GetVelocity::Response& res);
 
 	private:
-		ros::Subscriber		rossub_;
+		ros::NodeHandle		nh_;
+		ros::NodeHandle		private_nh_;
+		ros::Subscriber		sub_;
 		DxgpsbThread*		dxgpsb_;
 		std::string			port_;
+		float				max_vel_lin_;
+		float				min_vel_lin_;
+		float				max_vel_th_;
+		float				min_vel_th_;
 
-		ros::ServiceServer	rossrv_stop_;
-		ros::ServiceServer	rossrv_forward_;
-		ros::ServiceServer	rossrv_setvelocity_;
-		ros::ServiceServer	rossrv_getvelocity_;
+
+		ros::ServiceServer	srv_stop_;
+		ros::ServiceServer	srv_forward_;
+		ros::ServiceServer	srv_setvelocity_;
+		ros::ServiceServer	srv_getvelocity_;
 		
 
 };

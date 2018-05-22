@@ -3,28 +3,18 @@
 
 int main (int argc, char** argv) {
 
-	std::string port;
-
 	ros::init(argc, argv, "motors");
-	ros::NodeHandle node;
 
-	cnbiros::wheelchair::Motors	motors(&node);
-	motors.SetRate(50);
-
-	ros::param::get("~port", port);
-
+	cnbiros::wheelchair::Motors	motors;
 
 	try{
-		motors.Open(port);
+		motors.Open();
 	} catch (std::runtime_error& e) {
 		ROS_ERROR("%s", e.what());
 		ros::shutdown();
 	}
-	ROS_INFO("Wheelchair motors connected at port %s", port.c_str());
 
-	motors.Run();
-
-	ros::shutdown();
+	ros::spin();
 
 	return 0;
 }
